@@ -17,11 +17,10 @@ const taskSchema= new mongoose.Schema({
     completed:{
         type:Boolean,
         default:false
-
     },
-    receiverid:{
+    connectionid:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Kid',
+        ref:'Connection',
         required:true,
     },
     amount:{

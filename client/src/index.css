@@ -20,9 +20,11 @@ html {
 body {
   font-family: var(--font-family);
   font-weight: normal;
-  background: var(--surface-ground);
+  background: white;
   color: var(--text-color);
-  padding: 1rem;
+  /* padding: 1rem; */
+   padding-top: 2rem;
+   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -42,4 +44,164 @@ body {
   box-shadow: 0 0 5px rgba(0, 128, 0, 0.5); 
 }
 
+/* *{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+} */
+/* סידור עמוד עם תפריט קבוע בצד */
 
+
+/* .app-container {
+  display: flex;
+} */
+
+/* Sidebar קבוע במסכים גדולים */
+.sidebar {
+  width: 280px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+  background: #ffffff;
+  border-right: 1px solid #ddd;
+  padding: 20px;
+}
+
+/* תוכן העמוד */
+.content {
+  flex-grow: 1;
+  margin-left: 255px;   /* גורם לתוכן לא להיכנס מתחת לתפריט */
+}
+
+/* כפתור תפריט במסכים קטנים */
+.mobile-menu-button {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 200;
+}
+
+/* רספונסיביות - במסכים קטנים התפריט נעלם */
+
+@media (max-width: 1350px) {
+  .sidebar {
+    display: none;
+  }
+  .content {
+    margin-left: 0; /* התוכן תופס את כל הרוחב */
+  }
+}
+
+
+
+
+.card {
+  /* border: 1px solid #ccc; */
+  max-width:100%;
+  /* margin: auto; */
+  padding: 50px;
+  background: white;
+  /* box-shadow: 0 2px 5px rgba(0,0,0,0.1); */
+  /* border-radius: 10px; */
+  z-index: 1;
+}
+
+.p-datatable {
+  width: 100%;
+}
+
+.p-avatar {
+  border: 2px solid #ddd;
+}
+
+
+
+
+
+
+.form-container {
+  max-width: 100%;
+  margin: auto;
+  padding-top: 20px;
+  /* padding: 20px; */
+  background: white;
+  border-radius: 10px;
+  text-align: right;
+}
+
+.profile-section {
+  display: flex;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+}
+
+.add-avatar-btn {
+  position: absolute;
+  bottom: 5px;
+  right: 120px;
+}
+
+.form-content {
+  max-width: 500px;
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.p-inputgroup-addon {
+  background: #f1f1f1;
+}
+
+.save-btn {
+  margin-top: 10px;
+}
+
+.bg-light-green:hover {
+  background-color: rgba(144, 238, 144, 0.3); /* גוון ירוק בהיר מאוד */
+}
+.custom-icon-button .pi-bars {
+  color: green;
+}
+
+
+.calendar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+}
+
+.weekly-calendar {
+  width: 95%;
+  max-width: 1200px; /* הגדלתי את הרוחב המקסימלי */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse; /* חשוב לאיחוד גבולות */
+}
+
+th, td {
+  border: 1px solid #e0e0e0;
+  padding: 1rem;
+  text-align: center;
+}
+
+th {
+  font-weight: bold;
+  background-color: #f5f5f5; /* רקע לכותרות */
+}
+
+.day-cell {
+  min-height: 100px; /* גובה מינימלי לתאים */
+  vertical-align: top; /* יישור אנכי לחלק העליון */
+}

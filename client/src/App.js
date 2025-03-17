@@ -2,20 +2,25 @@ import logo from './logo.svg';
 import './App.css';
 import Login from './conponents/Login';
 import SignUp from './conponents/SignUp';
-import { Routes, Route, Link, useNavigate, Router } from 'react-router-dom'
-import Organizers from './conponents/Organizers';
-// import R from './components/R';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Site from './conponents/Manager/Site';
+
+
+
 function App() {
   return (
-    <>
-      {/* <div className="App">
-      </div> */}
-        <Routes>
+    <>      
+      <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/signUp" element={<SignUp />} />
-          <Route path="/organizer/:userid" element={<Organizers/>} />
-          {/* <Route path="/receiver/:userid" element={<R/>} />   */}
-        </Routes>
+         <Route path="/manager/:id" element={<Site />} />
+         <Route path="/manager/:id/addUser" element={<Site />} />
+         <Route path="/manager/:id/editClient" element={<Site />} />
+         <Route path="/manager/:id/details/:id" element={<Site />} />
+         <Route path="/manager/:id/settings" element={<Site />} />
+       </Routes>
+
+
     </>
 
   );

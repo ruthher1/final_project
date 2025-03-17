@@ -6,7 +6,6 @@ const userSchema= new mongoose.Schema({
     },
     userid:{
         type:String,
-        unique:true,
         required:true
     },
     password:{
@@ -16,10 +15,25 @@ const userSchema= new mongoose.Schema({
     role:{
         type:String,
         required:true,
-        enum:['organizer','receiver']
+        enum:['manager','client']
+    },
+    address:{
+        type:String,
+    },
+    phone:{
+        type:String,
+        required:true,
+    },
+    email:{
+        type:String,
+        required:true,
+    },
+    imageURL:{
+        type:String,
     },
 },{
     timestamps:true
 })
-
+ 
+userSchema.index({ userid: 1, role: 1 }, { unique: true });
 module.exports=mongoose.model('User',userSchema)
