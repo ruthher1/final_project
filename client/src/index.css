@@ -205,3 +205,12 @@ th {
   min-height: 100px; /* גובה מינימלי לתאים */
   vertical-align: top; /* יישור אנכי לחלק העליון */
 }
+/* .general-tab-header:hover .p-tabview-title {
+  color: green;
+} */
+
+
+
+.custom-icon-button .pi {
+  font-size: 1.8rem; /* ניתן להגדיל כרצונך */
+}

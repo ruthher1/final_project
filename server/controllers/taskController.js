@@ -37,15 +37,15 @@ const getTask = async (req, res) => {
 }
 
 const getTasksManager = async (req, res) => {
-    const { connectionid } = req.body
-    if (!connectionid) {
-        return res.status(400).send("connectionid is required")
-    }
-    const tasks = await Task.find({ connectionid }).lean()
-    if (!tasks) {
-        return res.status(400).send("tasks not found")
-    }
-    res.json(tasks)
+    // const { connectionid } = req.body
+    // if (!connectionid) {
+    //     return res.status(400).send("connectionid is required")
+    // }
+    // const tasks = await Task.find({ connectionid }).lean()
+    // if (!tasks) {
+    //     return res.status(400).send("tasks not found")
+    // }
+    // res.json(tasks)
 }
 
 const getTasksClient = async (req, res) => {
@@ -63,6 +63,33 @@ const getTasksClient = async (req, res) => {
     }
     res.json(tasks)
 }
+const getTasks = async (req, res) => {
+    try {
+        const { clientid } = req.params;
+        if (!clientid) {
+            return res.status(400).send("clientid is required");
+        }
+        const connections = await Connection.find({ clientid }).lean();
+        if (!connections) {
+            return res.status(400).send("Connections not found");
+        }
+
+        const allTasks = await Promise.all(connections.map(async (connection) => {
+            return await Task.find({ connectionid: connection._id }).populate("connectionid").lean();
+        }));
+
+        // const flattenedTasks = allTasks.flat();
+        // res.json(flattenedTasks);
+        res.json(allTasks);
+
+
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Server error");
+    }
+};
+
 
 const updateTask = async (req, res) => {
     const { id, title, description, amount } = req.body
@@ -128,4 +155,4 @@ const deleteTask = async (req, res) => {
     res.json(tasks)
 }
 
-module.exports = { addTask, getTask, getTasksManager, updateTask, deleteTask, completeTask,getTasksClient }
+module.exports = {getTasks, addTask, getTask, getTasksManager, updateTask, deleteTask, completeTask,getTasksClient }

@@ -7,26 +7,20 @@ import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
 import { useNavigate } from "react-router-dom";
+import { Dropdown } from "primereact/dropdown";
 
-export default function Header(props) {
-  const manager=props.manager||{}
-  const setManager=props.setManager||{}
-
+export default function HeaderClient(props) {
   const id = props.id || {}
-  const token = JSON.parse(localStorage.getItem('token')) || ""
-  const num = props.num || {}
+  const client=props.client||{}
+  const setClient=props.setClient||{}
+    const managers = props.managers || {}
+    const[selectedManager,srtSelectedManager]=useState({})
+    const tasks = props.tasks || {}
+    const setTasks = props.setTasks || {} 
+     const token = JSON.parse(localStorage.getItem('token')) || ""
   const navigate = useNavigate()
   // const [image, setImage] = useState(null);
-  const contacts = props.contacts || [];
-  const [coppyContacts, setCoppyContacts] = useState([]);
-  useEffect(() => {
-    if (coppyContacts.length === 0) {
-      setCoppyContacts([...contacts])
-    }
-  }, [contacts]);
 
-
-  const setContacts = props.setContacts || {}
   const handleAvatarClick = () => {
     document.getElementById("fileInput").click();
   };
@@ -40,7 +34,7 @@ export default function Header(props) {
           const res = await axios.put(`http://localhost:2000/api/users/addImage`, { id: id, imageURL: reader.result },
             { headers: { Authorization: `Bearer ${token}` } })
           if (res.status === 200) {
-            setManager(res.data)
+            setClient(res.data)
           }
         }
         catch (err) {
@@ -53,13 +47,9 @@ export default function Header(props) {
   };
 
 
-  const searchName = (valName) => {
-    setContacts(coppyContacts.filter((contact) => { return contact.name.includes(valName) }))
-  }
-
-
 
   return (
+    <>
     <div
       className="header-container"
       style={{
@@ -80,22 +70,18 @@ export default function Header(props) {
     >
       <h2></h2>
       <h2></h2>
-
-      <div className="p-inputgroup" style={{ width: "45%" }}>
-        {num === 1 ? <>
-          <span className="p-inputgroup-addon">
-            <i className="pi pi-search" />
-          </span>
-          <InputText type="text" className="p-inputtext-lg" placeholder="Search..." onChange={(e) => { searchName(e.target.value) }} /></> : null
-        }
+      <div >
+            <Dropdown value={selectedManager} onChange={(e) => srtSelectedManager(e.value)} options={managers} optionLabel="managerid" 
+                placeholder="Select a Project" className="w-full md:w-14rem" />
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <span>{manager.name}</span>
+        <span>{client.name}</span>
         <Button icon="pi pi-bell" className="p-button-rounded p-button-text p-button-secondary" />
         <Button icon="pi pi-envelope" className="p-button-rounded p-button-text p-button-secondary" />
-        <Button icon="pi pi-user" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { num == 1 ? navigate(0, { state: { id, num: 1 } }) : navigate(`/manager/${id}`, { state: { id, num: 1 } }) }} />
-        <Button icon="pi pi-cog" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { navigate(`/manager/${id}/settings`, { state: { id, num: 4 } }) }} />
+        <Button icon="pi pi-cog" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { navigate(`/client/${id}/settings`, { state: id}) }} />
+        <Button icon="pi pi-comment" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { navigate(`/client/${id}/chat`, { state: id}) }} />
+
         {/* <Avatar 
         label='a' size="large" shape="circle" /> */}
         <div>
@@ -106,11 +92,11 @@ export default function Header(props) {
             onClick={handleAvatarClick}
             style={{
               cursor: "pointer",
-              backgroundImage: `url(${manager.imageURL})`,
+              backgroundImage: `url(${client.imageURL})`,
               backgroundSize: "cover",
               backgroundPosition: "center"
             }}
-            src={manager.imageURL}
+            src={client.imageURL}
           />
           <input
             id="fileInput"
@@ -123,5 +109,7 @@ export default function Header(props) {
       </div>
 
     </div>
+
+    </>
   );
 }

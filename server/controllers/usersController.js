@@ -70,19 +70,29 @@ const addClient = async (req, res) => {
 
 const getManagerClients = async (req, res) => {
     const { id } = req.params
-    const user = await User.findById(id).lean()
-    if (!user) {
-        return res.status(400).send("user not found")
+    if(!id)
+    {
+        return res.status(400).send("id is requiered")
     }
-
-    const clients = await Connection.find({ managerid: user._id.toString() }).populate("clientid").populate("projectid").lean()
+    const clients = await Connection.find({ managerid: id }).populate("clientid").populate("projectid").lean()
     if (!clients)
         return res.status(400).send("clients not found")
     const uniqueArray = [...new Set(clients)];
     res.json(uniqueArray)
 
 }
-
+const getClientManagers=async(req,res)=>{
+    const { id } = req.params
+    if(!id)
+        {
+            return res.status(400).send("id is requiered")
+        }
+    const managers = await Connection.find({ clientid: id}).populate("managerid").lean()
+    if (!managers)
+        return res.status(400).send("managers not found")
+    const uniqueArray = [...new Set(managers)];
+    res.json(uniqueArray)
+}
 const getClient = async (req, res) => {
     const { id, projectid } = req.body
     const user = await User.findById(id).lean()
@@ -108,7 +118,7 @@ const getClient = async (req, res) => {
     res.json(tasks)
 
 }
-const getManager = async (req, res) => {
+const getUser = async (req, res) => {
     const { id } = req.params
     const user = await User.findById(id).lean()
     if (!user) {
@@ -130,20 +140,42 @@ const getProjectClients = async (req, res) => {
 
 
 const updateUser = async (req, res) => {
-    const { id, name, password, address, phone, email } = req.body
-    if (!name || !password || !id || !phone || !email) {
-        return res.status(400).send("name and password are required")
+    
+    const { id, name, address, phone, email } = req.body
+    if (!name || !id || !phone || !email) {
+        return res.status(400).send("name phone email id are required")
     }
     const user = await User.findById(id).exec()
     if (!user) {
         return res.status(400).send("user not found")
     }
-    const newpass = await bcrypt.hash(password, 10)
     user.name = name
-    user.password = newpass
     user.address = address
     user.phone = phone
     user.email = email
+    const newUser = await user.save()
+    if (!newUser) {
+        return res.status(400).send("newUser not updated")
+    }
+    res.json(newUser)
+}
+
+const changePassword = async (req, res) => {
+    
+    const { id,password ,newpassword} = req.body
+
+    if (!password || !id || !newpassword) {
+        return res.status(400).send("newpassword id password are required")
+    }
+    const user = await User.findById(id).exec()
+    if (!user) {
+        return res.status(400).send("user not found")
+    }
+    const match = await bcrypt.compare(password, user.password)    
+        if(!match)
+            return res.status(400).send("password not correct")
+    const newpass = await bcrypt.hash(newpassword, 10)
+    user.password = newpass
     const newUser = await user.save()
     if (!newUser) {
         return res.status(400).send("newUser not updated")
@@ -207,4 +239,4 @@ const addImage = async (req, res) => {
     res.json(newUser)
 }
 
-module.exports = { addImage,addManager, addClient, getManager, getClient, getProjectClients, updateUser, deleteClient, getManagerClients }
+module.exports = {changePassword, addImage,addManager, addClient, getUser, getClient, getProjectClients, updateUser, deleteClient, getManagerClients ,getClientManagers}

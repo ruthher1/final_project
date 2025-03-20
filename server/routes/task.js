@@ -12,5 +12,8 @@ router.get("/getTasksClient/:managerid/:projectid/:clientid",userJWT,taskControl
 router.put("/updateTask",userJWT,taskController.updateTask)
 router.put("/completeTask",userJWT,taskController.completeTask)
 router.delete("/deleteTask/:id",userJWT,taskController.deleteTask)
+router.get("/getTasks/:clientid",userJWT,taskController.getTasks)
+
+
 
 module.exports=router
