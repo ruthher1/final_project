@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const corsOptions = require("./config/corsOptions");
 const mongoose = require("mongoose");
@@ -30,6 +31,7 @@ const bodyParser = require("body-parser");
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -55,19 +57,13 @@ mongoose.connection.on("error", (error) => {
 let messages = [];
 
 io.on('connection', (socket) => {
-    // console.log('User connected:', socket.id);
     
-    // Send all previous messages to the client when they connect
     socket.emit('previousMessages', messages);
 
-    // Receive and send messages
     socket.on('sendMessage', (message) => {
-        messages.push(message); // Save the message
-        io.emit('newMessage', message); // Broadcast the message to all connected clients
+        messages.push(message);
+        io.emit('newMessage', message); 
     });
-
-    // Disconnect event
     socket.on('disconnect', () => {
-        // console.log('User disconnected:', socket.id);
     });
 });

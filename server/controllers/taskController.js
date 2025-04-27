@@ -1,23 +1,50 @@
 const Task = require("../models/Task")
 const User = require("../models/User")
+const File = require("../models/File")
 const Connection = require("../models/Connection")
-const addTask = async (req, res) => {    
-    const { title, description, managerid,clientid,projectid, amount, date } = req.body
-    if (!title || !managerid||!clientid||!projectid || !amount || !date ) {
-        return res.status(400).send("title connectionid amount date are required")
-    }
 
-    const connection = await Connection.findOne({clientid,projectid,managerid}).lean()
+const addTask = async (req, res) => {
+    console.log("addTask");
+    
+    const { title, description, managerid, clientid, projectid, date } = req.body
+    const file=req.file
+    if (!title || !managerid || !clientid || !projectid || !date) {
+        return res.status(400).send("title connectionid date are required")
+    }
+    // console.log(req.file)
+    let fileExists=null
+    let fileData=null
+    // console.log(file);
+    if (file) {
+        fileData = {
+            fileName: file.originalname,
+            filePath: file.path,
+            fileSize: file.size,
+            fileType: file.mimetype
+        };
+        if (!file.originalname || !file.path || !file.size || !file.mimetype) {
+            return res.status(400).send("name type size path are required")
+        }
+        
+        fileExists = await File.findOne(fileData).lean()
+        if (!fileExists) {
+            console.log("הקובץ לא קים ומוסיף אותו");
+            fileExists = await File.create(fileData)
+            if (!fileExists) {
+                return res.status(400).send("fileExists not created")
+            }
+        }
+    }
+    const connection = await Connection.findOne({ clientid, projectid, managerid }).lean()
     if (!connection) {
         return res.status(400).send("connection ient not found")
     }
-
-    const task = await Task.create({ title, connectionid:connection._id.toString(), description, amount, date })
+    const task = await Task.create({ title, connectionid: connection._id.toString(), description, date, file: fileExists?._id })
     if (!task) {
         return res.status(400).send("task not created")
     }
 
-    const tasks = await Task.find({ connectionid:connection._id }).lean()
+    const tasks = await Task.find({ connectionid: connection._id }).populate("file").lean()
     if (!tasks) {
         return res.status(400).send("tasks not found")
     }
@@ -29,7 +56,7 @@ const addTask = async (req, res) => {
 
 const getTask = async (req, res) => {
     const { id } = req.params
-    const task = await Task.findById(id).lean()
+    const task = await Task.findById(id).populate("file").lean()
     if (!task) {
         return res.status(400).send("task not found")
     }
@@ -49,65 +76,121 @@ const getTasksManager = async (req, res) => {
 }
 
 const getTasksClient = async (req, res) => {
-    const { projectid,managerid, clientid } = req.params
-    if (!projectid || !clientid ||!managerid) {
+    const { projectid, managerid, clientid } = req.params
+    if (!projectid || !clientid || !managerid) {
         return res.status(400).send("managerid projectid clientid are required")
     }
-    const connection=await Connection.findOne({ projectid,managerid, clientid}).lean()
-    if(!connection){
+    const connection = await Connection.findOne({ projectid, managerid, clientid }).lean()
+    if (!connection) {
         return res.status(400).send("connection not found")
     }
-    const tasks = await Task.find({ connectionid:connection._id}).lean()
+    const tasks = await Task.find({ connectionid: connection._id }).populate("file").lean()
     if (!tasks) {
         return res.status(400).send("tasks not found")
     }
     res.json(tasks)
 }
+
+// const getTasks = async (req, res) => {
+//     try {
+//         const { clientid } = req.params;
+//         if (!clientid) {
+//             return res.status(400).send("clientid is required");
+//         }
+//         const connections = await Connection.find({ clientid }).lean();
+//         if (!connections) {
+//             return res.status(400).send("Connections not found");
+//         }
+
+//         const allTasks = await Promise.all(connections.map(async (connection) => {
+//             return await Task.find({ connectionid: connection._id }).populate("connectionid").populate("file").lean();
+//         }));
+
+//         res.json(allTasks);
+
+
+
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send("Server error");
+//     }
+// };
 const getTasks = async (req, res) => {
-    try {
-        const { clientid } = req.params;
-        if (!clientid) {
-            return res.status(400).send("clientid is required");
-        }
-        const connections = await Connection.find({ clientid }).lean();
-        if (!connections) {
-            return res.status(400).send("Connections not found");
-        }
-
-        const allTasks = await Promise.all(connections.map(async (connection) => {
-            return await Task.find({ connectionid: connection._id }).populate("connectionid").lean();
-        }));
-
-        // const flattenedTasks = allTasks.flat();
-        // res.json(flattenedTasks);
-        res.json(allTasks);
-
-
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Server error");
+    const { clientid } = req.params;
+    if (!clientid) {
+        return res.status(400).send("clientid is required");
     }
+    const connections = await Connection.find({ clientid }).lean();
+    if (!connections.length) {
+        return res.status(400).send("Connections not found");
+    }
+    const connectionIds = connections.map(c => c._id);
+    // const allTasks = await (await Task.find({ connectionid: { $in: connectionIds } }).populate("connectionid")).populate('mananagerid').populate("file").lean();
+    const allTasks = await Task.find({ connectionid: { $in: connectionIds } }).populate({path: "connectionid",populate: {path: "managerid"  }}) .populate("file") .lean();
+
+
+    res.json(allTasks);
 };
 
 
 const updateTask = async (req, res) => {
-    const { id, title, description, amount } = req.body
-    if (!title || !id || !amount ) {
-        return res.status(400).send("title id amount are required")
+    const { id, title, description } = req.body
+    const file=req.file
+    
+    if (!title || !id) {
+        return res.status(400).send("title id are required")
     }
     const task = await Task.findById(id).exec()
     if (!task) {
         return res.status(400).send("task not found")
     }
+    let fileExists = null
+    let fileData = null
+    if (file) {
+        fileData = {
+            fileName: file.originalname,
+            filePath: file.path,
+            fileSize: file.size,
+            fileType: file.mimetype
+        };
+        const tasks = await Task.find({ file: task.file}).lean()
+        if (!tasks) {
+            return res.status(400).send("tasks not found")
+        }
+        if (tasks.length === 1) {
+            const deletefile = await File.findById(task.file).exec()
+            if (!deletefile) {
+                return res.status(400).send("deletefile not found")
+            }
+
+            const result = await deletefile.deleteOne()
+            if (!result) {
+                return res.status(400).send("project not deleted")
+            }
+        }
+
+        // if (!file.fileName || !file.filePath || !file.fileSize || !file.fileType) {
+        //     return res.status(400).send("name type size path are required")
+        // }
+        if (!file.originalname || !file.path || !file.size || !file.mimetype) {
+            return res.status(400).send("name type size path are required")
+        }
+        fileExists = await File.findOne(fileData).lean()
+        if (!fileExists) {
+            fileExists = await File.create(fileData)
+            if (!fileExists) {
+                return res.status(400).send("fileExists not created")
+            }
+        }
+    }
     task.title = title
     task.description = description
-    task.amount = amount
+    task.file = fileExists?fileExists._id:null
     const newTask = await task.save()
     if (!newTask) {
         return res.status(400).send("task not updated")
     }
-    const tasks = await Task.find({ connectionid: task.connectionid }).lean()
+    const tasks = await Task.find({ connectionid: task.connectionid }).populate("file").lean()
     if (!tasks) {
         return res.status(400).send("tasks not found")
     }
@@ -115,9 +198,9 @@ const updateTask = async (req, res) => {
 }
 
 const completeTask = async (req, res) => {
-    const { id, completed, difficulty, comment } = req.body
-    if (!id || !completed, !difficulty) {
-        return res.status(400).send("compleated difficulty id are required")
+    const { id, completed, difficulty, comment ,clientid} = req.body
+    if (!id||!clientid) {
+        return res.status(400).send("id clientid is required")
     }
     const task = await Task.findById(id).exec()
     if (!task) {
@@ -130,11 +213,23 @@ const completeTask = async (req, res) => {
     if (!newTask) {
         return res.status(400).send("task not updated")
     }
-    const tasks = await Task.find({ connectionid:task.connectionid, date: task.date }).lean();
-    if (!tasks) {
+    // const tasks = await Task.find({ connectionid: task.connectionid }).populate({path: "connectionid",populate: {path: "managerid"  }}).populate("file").lean();
+    // if (!tasks) {
+    //     return res.status(400).send("tasks not found")
+    // }
+    // res.json(tasks)
+    const connections = await Connection.find({clientid}).lean();
+    if (!connections.length) {
+        return res.status(400).send("Connections not found");
+    }
+    const connectionIds = connections.map(c => c._id);
+    // const allTasks = await (await Task.find({ connectionid: { $in: connectionIds } }).populate("connectionid")).populate('mananagerid').populate("file").lean();
+    const allTasks = await Task.find({ connectionid: { $in: connectionIds } }).populate({path: "connectionid",populate: {path: "managerid"  }}) .populate("file") .lean();
+    if (!allTasks) {
         return res.status(400).send("tasks not found")
     }
-    res.json(tasks)
+
+    res.json(allTasks)
 }
 
 const deleteTask = async (req, res) => {
@@ -147,12 +242,29 @@ const deleteTask = async (req, res) => {
     if (!task) {
         return res.status(400).send("task not found")
     }
+    if (task.file) {
+        const tasks = await Task.find({ file: task.file._id }).lean()
+        if (!tasks) {
+            return res.status(400).send("tasks not found")
+        }
+        if (tasks.length === 1) {
+            const file = await File.findById(task.file._id).exec()
+            if (!file) {
+                return res.status(400).send("file not found")
+            }
+
+            const result = await file.deleteOne()
+            if (!result) {
+                return res.status(400).send("project not deleted")
+            }
+        }
+    }
     const result = await task.deleteOne()
-    const tasks = await Task.find({ connectionid: task.connectionid}).lean()
+    const tasks = await Task.find({ connectionid: task.connectionid }).populate("file").lean()
     if (!tasks) {
         return res.status(400).send("tasks not found")
     }
     res.json(tasks)
 }
 
-module.exports = {getTasks, addTask, getTask, getTasksManager, updateTask, deleteTask, completeTask,getTasksClient }
+module.exports = { getTasks, addTask, getTask, getTasksManager, updateTask, deleteTask, completeTask, getTasksClient }

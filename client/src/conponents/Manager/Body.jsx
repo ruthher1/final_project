@@ -7,10 +7,14 @@ import { Avatar } from "primereact/avatar";
 import { useEffect, useState, useRef } from "react"
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
+import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import { useSelector } from "react-redux";
 
 export default function Body(props) {
     const navigate = useNavigate()
-    const id = props.id || {}
+    // const id = props.id || {}
+    const id=useSelector(x=>x.Id.id)
+    
     const contacts = props.contacts || {}
     const setContacts = props.setContacts || {}
     const token = JSON.parse(localStorage.getItem('token')) || ""
@@ -37,16 +41,17 @@ export default function Body(props) {
         getContacts()
     }, [])
 
-    // רינדור עמודת תמונה (אם יש תמונה מציגים אותה, אחרת מציגים אות ראשונה)
-    const avatarBodyTemplate = (rowData) => {
-        return typeof rowData.avatar === "string" && rowData.avatar.startsWith("http") ? (
-            <Avatar image={rowData.avatar} shape="circle" size="large" />
-        ) : (
-            <Avatar label={rowData.avatar} shape="circle" size="large" />
-        );
-    };
-
     const detailsClient = (rowData) => {
+        const confirm = (event) => {
+            confirmPopup({
+              target: event.currentTarget,
+              message: 'Do you want to delete this client?',
+              icon: 'pi pi-info-circle',
+              defaultFocus: 'reject',
+              accept:(()=>{handleDelete()}),
+              reject:()=>{}
+            });
+          };
         const handleDelete = async () => {
             const client = { id: rowData._id, managerid: id, projectid: rowData.projectid }
             try {
@@ -56,7 +61,7 @@ export default function Body(props) {
                         headers: { Authorization: `Bearer ${token} ` }
                     })
                 if (res.status === 200) {
-                    const clients = res.data.map(client => { return { ...client.clientid, project: client.projectid.name } })
+                    const clients = res.data.map(client => { return { ...client.clientid, project: client.projectid.name,projectid: client.projectid._id } })
                     setContacts(clients)
                 }
             } catch (err) {
@@ -65,18 +70,41 @@ export default function Body(props) {
         };
 
         const handleEdit = () => {
-            navigate(`./editClient`, { state: { id, rowData } })
+            navigate(`./editClient`, { state: { rowData ,num:3} })
         };
 
         const handleDetails = () => {
-            navigate(`./details/${rowData._id}`, { state:{id,rowData,num:5} })
+            navigate(`./details/${rowData._id}`, { state:{rowData,num:5} })
         };
         return (
             <>
-                <Button icon="pi pi-trash" className="p-button-text" onClick={handleDelete} />
+                <ConfirmPopup/>
+                <Button icon="pi pi-trash" className="p-button-text" onClick={(e)=>{confirm(e)}} />
                 <Button icon="pi pi-pencil" className="p-button-text" onClick={handleEdit} />
                 <Button label="Details" icon="pi pi-eye" className="p-button-text" onClick={handleDetails} />
             </>
+        );
+    };
+
+    const avatarBodyTemplate = (rowData) => {
+        return (
+            <div style={{ display: "flex", alignItems: "center" }}>
+                
+                    <Avatar
+                        label={rowData.imageURL ?"":rowData.name ? rowData.name[0] : ""} 
+                        size="large"
+                        shape="circle"
+                        style={{
+                            backgroundImage: `url(${rowData.imageURL})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            marginRight: "10px",
+                        }}
+                        src={rowData.imageURL}
+                    />
+                
+                <span>{rowData.name}</span>
+            </div>
         );
     };
 
@@ -84,13 +112,11 @@ export default function Body(props) {
         <div className="card">
             <h2>Clients</h2>
             <DataTable value={contacts} responsiveLayout="scroll">
-                <Column field="name" header="Name" />
+                <Column field="name" header="Name"  body={avatarBodyTemplate}/>
                 <Column field="email" header="Email" />
                 <Column field="phone" header="Phone" />
                 <Column field="project" header="Project" />
-                <Column header="Profile" body={avatarBodyTemplate} />
                 <Column header="Details" body={detailsClient} />
-
             </DataTable>
         </div>
     );

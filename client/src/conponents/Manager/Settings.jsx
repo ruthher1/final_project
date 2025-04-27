@@ -6,14 +6,18 @@ import { Avatar } from 'primereact/avatar';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { User, Mail, Phone, Lock,MapPin  } from 'lucide-react';
 import axios from "axios"
+import { useSelector } from 'react-redux';
 
 
 export default function Settings(props) {
     const token = JSON.parse(localStorage.getItem('token')) || ""
-    const id=props.id||{}
-    const manager=props.manager||{}
-    const setManager=props.setManager||{}
-
+    // const id=props.id||{}
+      const id=useSelector(x=>x.Id.id)
+    
+    // const manager=props.manager||{}
+    // const setManager=props.setManager||{}
+    const manager = props.manager || {}
+    const setManager = props.setManager || {}
 const updateUser=async()=>{
 
     try {

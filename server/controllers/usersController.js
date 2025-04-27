@@ -55,7 +55,6 @@ const addClient = async (req, res) => {
     }
     else {
         const newpass = await bcrypt.hash(password, 10)
-        console.log(name, userid, newpass, address, phone, email);
         user = await User.create({ name, userid, password: newpass, address, phone, email, role: "client" })
         if (!user) {
             return res.status(400).send("user not created")
@@ -208,7 +207,6 @@ const deleteClient = async (req, res) => {
 
         }
     }
-    console.log("a");
     const deleteTask = await Task.deleteMany({ connectionid: connection._id }).exec()
     if (!deleteTask) {
         return res.status(400).send("tasks not deleted")
@@ -218,7 +216,6 @@ const deleteClient = async (req, res) => {
         return res.status(400).send("clients not found")
 
     const uniqueArray = [...new Set(clients)];
-    console.log(uniqueArray);
     res.json(uniqueArray)
 }
 

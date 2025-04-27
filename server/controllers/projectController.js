@@ -3,9 +3,6 @@ const ProjectToManager = require("../models/ProjectToManager")
 const Connection = require("../models/Connection")
 const User = require("../models/User")
 
-const Receiver = require("../models/User")
-
-
 const addProject = async (req, res) => {
     const { name, managerid } = req.body
     if (!name || !managerid) {
@@ -73,13 +70,11 @@ const deleteProject = async (req, res) => {
     if (!project) {
         return res.status(400).send("project not found")
     }
-    console.log(project);
     const result = await project.deleteOne()
     if (!result) {
         return res.status(400).send("project not deleted")
     }
     const projectExists = await ProjectToManager.findOne({ projectid }).exec()
-    console.log(projectExists);
     if (!projectExists) {
         const p = await Project.findById(projectid).exec()
         if (!p) {

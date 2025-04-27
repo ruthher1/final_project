@@ -6,21 +6,27 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Card } from 'primereact/card';
 import axios from 'axios'
 import { RadioButton } from "primereact/radiobutton";
+import { useDispatch, useSelector } from "react-redux"
 
 // import myfamily from '../pictures/family.png'
+
 
 const Login = () => {
     const [valueRole, setValueRole] = useState('');
     const [valueId, setValueId] = useState("")
     const [valuePass, setValuePass] = useState("")
     const navigate = useNavigate()
+    const id=useSelector(x=>x.Id.id)
+    const dispatch=useDispatch()
 
     const log_in = async () => {
         try {
             const res = await axios.post('http://localhost:2000/api/login', { userid: valueId, password: valuePass, role: valueRole })
             if (res.status === 200) {
                 localStorage.setItem("token", JSON.stringify(res.data.accessToken))
-                valueRole === "manager" ? navigate(`./manager/${res.data.id}`, { state: {id:res.data.id,num:1} }) : navigate(`./client/${res.data.id}`, { state: {id:res.data.id} })
+                // valueRole === "manager" ? navigate(`./manager/${res.data.id}`, { state: {id:res.data.id,num:1} }) : navigate(`./client/${res.data.id}`, { state: {id:res.data.id} })
+                dispatch({type:"fill",payload:res.data.id})
+                valueRole === "manager" ? navigate(`./manager/${res.data.id}`, { state: {num:1} }) : navigate(`./client/${res.data.id}`)
 
             }
         }

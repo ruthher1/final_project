@@ -3,6 +3,7 @@ const allowedOrigins = [
     'http://localhost:5500',
     'http://localhost:8000',
      'http://localhost:4000',
+
 ]
 
 const corsOptions = {

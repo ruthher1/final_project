@@ -14,9 +14,16 @@ import 'primeicons/primeicons.css';
 import io from 'socket.io-client';
 import { ScrollPanel } from 'primereact/scrollpanel';
 import { Message } from 'primereact/message';
+import DetailsTask from './DetailsTask';
+import { useSelector } from 'react-redux';
+
 
 const DetailsCalander = (props) => {
-    const id = props.id || {}
+    // const contacts = props.contacts || {}
+    // console.log(contacts)
+    // const id = props.id || {}
+     const id=useSelector(x=>x.Id.id)
+    
     const rowData = props.rowData || {}
     const [date, setDate] = useState(new Date());
     const [showAdd, setShowAdd] = useState(false);
@@ -27,8 +34,9 @@ const DetailsCalander = (props) => {
     const menuLeft = useRef(null);
     const [visible, setVisible] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
-    const manager=props.manager||{}
-    const setManager=props.setManager||{}
+    const manager = props.manager || {}
+    const setManager = props.setManager || {}
+    const [showDetails, setShowDetails] = useState(false)
     const items = [
         {
             items: [
@@ -45,42 +53,40 @@ const DetailsCalander = (props) => {
                 {
                     label: 'Details',
                     icon: 'pi pi-eye',
-                    command: () => console.log("Details")
+                    command: () => setShowDetails(true)
+
                 },
             ]
         }
     ];
 
     const [task, setTask] = useState({
-        title: "",
-        description: "",
         managerid: id,
         projectid: rowData.projectid,
         clientid: rowData._id,
-        amount: "",
-        date: null,
-        _id: null
     });
 
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
-
+    // const toastFile = useRef(null);
     const messagesEndRef = useRef(null)
-
     const socket = io('http://localhost:2000');
+
+    // const onUpload = () => {
+    //     toast.current.show({ severity: 'info', summary: 'Success', detail: 'File Uploaded' });
+    // };
 
 
     useEffect(() => {
         const socket = io('http://localhost:2000');
 
-        // קבלת הודעות ישנות כאשר המטופל מתחבר
         socket.on('previousMessages', (msgs) => {
-            setMessages(msgs.filter((msg)=>{return (msg.senderId===id && msg.receiverId===rowData._id)|| (msg.senderId===rowData._id && msg.receiverId===id)}));        });
+            setMessages(msgs.filter((msg) => { return (msg.senderId === id && msg.receiverId === rowData._id) || (msg.senderId === rowData._id && msg.receiverId === id) }));
+        });
 
-        // קבלת הודעה חדשה מהקלינאית
         socket.on('newMessage', (message) => {
-            if((message.senderId===id && message.receiverId===rowData._id)|| (message.senderId===rowData._id && message.receiverId===id)){    
-            setMessages((prevMessages) => [...prevMessages, message]);
+            if ((message.senderId === id && message.receiverId === rowData._id) || (message.senderId === rowData._id && message.receiverId === id)) {
+                setMessages((prevMessages) => [...prevMessages, message]);
             }
         });
 
@@ -111,8 +117,8 @@ const DetailsCalander = (props) => {
         if (newMessage.trim() !== '') {
             const message = {
                 sender: manager.name,
-                senderId:id,
-                receiverId:rowData._id,
+                senderId: id,
+                receiverId: rowData._id,
                 content: newMessage,
                 timestamp: new Date().toLocaleTimeString(),
             };
@@ -184,12 +190,31 @@ const DetailsCalander = (props) => {
     }
 
     const addTask = async () => {
+        const formData = new FormData();
+        formData.append("title", task.title);
+        formData.append("date", task.date);
+        formData.append("managerid", task.managerid);
+        formData.append("clientid", task.clientid);
+        formData.append("projectid", task.projectid);
+        if(task.description) {
+        formData.append("description", task.description);
+        }
+        formData.append("file", task.file);
         try {
-            const res = await axios.post(`http://localhost:2000/api/tasks/addTask`, task,
+             const res = await axios.post(`http://localhost:2000/api/tasks/addTask`, formData,
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                const dataTasks = res.data.map((task) => { return task })
-                setTasks(dataTasks)
+                setTasks(res.data)
+                setTask({
+                    title: "",
+                    description: "",
+                    managerid: id,
+                    projectid: rowData.projectid,
+                    clientid: rowData._id,
+                    date: null,
+                    _id: null,
+                    file: {},
+                })
             }
         }
         catch (err) {
@@ -202,8 +227,9 @@ const DetailsCalander = (props) => {
             const res = await axios.delete(`http://localhost:2000/api/tasks/deleteTask/${taskid}`,
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                const tasksData = res.data.map((task) => { return task })
-                setTasks(tasksData)
+                // const tasksData = res.data.map((task) => { return task })
+                setTasks(res.data)
+
             }
         }
         catch (error) {
@@ -212,8 +238,15 @@ const DetailsCalander = (props) => {
     }
 
     const editTask = async () => {
+        const formData = new FormData();
+        formData.append("title", selectedTask.title);
+        formData.append("file", selectedTask.file);
+        formData.append("id", selectedTask._id);
+        if(selectedTask.description) {
+        formData.append("description", selectedTask.description);
+        }
         try {
-            const res = await axios.put(`http://localhost:2000/api/tasks/updateTask`, { ...selectedTask, id: selectedTask._id },
+            const res = await axios.put(`http://localhost:2000/api/tasks/updateTask`, formData,
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
                 const dataTasks = res.data.map((task) => { return task })
@@ -231,7 +264,7 @@ const DetailsCalander = (props) => {
             <Toast ref={toast}></Toast>
             <Menu model={items} popup ref={menuLeft} id="popup_menu_left" />
             <div style={{ display: "flex", justifyContent: "flex-start", paddingLeft: "60px", alignItems: "center", marginTop: "40px" }}>
-                <h1 >Client:  {rowData.name}</h1>
+                <h1 >Client:  {rowData.name ? rowData.name.split(' ').map(name => name.charAt(0).toUpperCase() + name.slice(1)).join(' ') : ""}</h1>
             </div>
             <div className="calendar-container" style={{ marginTop: "0px" }}>
                 <Card className="weekly-calendar">
@@ -246,7 +279,7 @@ const DetailsCalander = (props) => {
                             <i className="pi pi-chevron-right"></i>
                         </button>
                     </div>
-                    <table> {/* שימוש בטבלה */}
+                    <table> 
                         <thead>
                             <tr>
                                 {daysOfWeek.map((day) => (
@@ -300,7 +333,7 @@ const DetailsCalander = (props) => {
                                                         <i
                                                             className="pi pi-ellipsis-v"
                                                             style={{ marginRight: "5px", cursor: "pointer" }}
-                                                            onClick={(event) => { menuLeft.current.toggle(event); setSelectedTask({ ...t }); }}
+                                                            onClick={(event) => { setShowDetails(false); menuLeft.current.toggle(event); setSelectedTask({ ...t }); }}
                                                         />
 
                                                     </div>
@@ -336,13 +369,16 @@ const DetailsCalander = (props) => {
                         </div>
                         <div className="inline-flex flex-column gap-2">
                             <InputTextarea onChange={(e) => setTask({ ...task, description: e.target.value })} rows={5} cols={30} placeholder='Description' className="input-focus" />
-                            {/* <InputText onChange={(e) => setTask({ ...task, description: e.target.value })} className="input-focus" placeholder="Description" label="Description" type="text"></InputText> */}
                         </div>
-                        <div className="inline-flex flex-column gap-2">
-                            <InputText onChange={(e) => setTask({ ...task, amount: e.target.value })} className="input-focus" placeholder="Amount" label="Amount" type="text" required></InputText>
-                        </div>
-                        <div className="card flex justify-content-center">
-                            {/* <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload uploadHandler={customBase64Uploader} /> */}
+                        <div className="inline-flex flex-column gap-2 justify-content-center">
+                            <FileUpload chooseLabel="Upload Files"
+                                chooseOptions={{ style: { width: '100%', color: "green", background: "white", border: '1px solid green' } }}
+                                mode="basic" name="demo[]" url="/api/upload" maxFileSize={1000000}
+                                onSelect={(e) => {
+                                    const newfile = e.files[0];
+                                    setTask({ ...task, file: newfile})
+                                }}
+                            />
                         </div>
                         <div className="flex align-items-center gap-2">
                             <Button label="Add" onClick={(e) => { hide(e); addTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
@@ -358,18 +394,59 @@ const DetailsCalander = (props) => {
                 onHide={() => { if (!showEdit) return; setShowEdit(false); }}
                 content={({ hide }) => (
                     <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
+
                         <div className="inline-flex flex-column gap-2">
                             <InputText value={selectedTask.title} onChange={(e) => setSelectedTask({ ...selectedTask, title: e.target.value })} className="input-focus" placeholder="Task Name" label="TaskName" type="text" required></InputText>
                         </div>
                         <div className="inline-flex flex-column gap-2">
                             <InputTextarea value={selectedTask.description} onChange={(e) => setSelectedTask({ ...selectedTask, description: e.target.value })} rows={5} cols={30} placeholder='Description' className="input-focus" />
-                            {/* <InputText onChange={(e) => setTask({ ...task, description: e.target.value })} className="input-focus" placeholder="Description" label="Description" type="text"></InputText> */}
                         </div>
-                        <div className="inline-flex flex-column gap-2">
-                            <InputText value={selectedTask.amount} onChange={(e) => setSelectedTask({ ...selectedTask, amount: e.target.value })} className="input-focus" placeholder="Amount" label="Amount" type="text" required></InputText>
-                        </div>
-                        <div className="card flex justify-content-center">
-                            {/* <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload uploadHandler={customBase64Uploader} /> */}
+                        <div className="inline-flex flex-column gap-2 justify-content-center">
+                            {selectedTask.file && (
+                                <div className="flex items-center gap-2 mt-3 p-2 border rounded-md bg-gray-50">
+                                    <i className="pi pi-file" style={{ fontSize: '1.5rem' }}></i>
+                                    <div className="flex flex-col">
+                                        <span className="font-medium">{selectedTask.file.fileName}</span>
+                                    </div>
+                                    <Button
+                                        icon="pi pi-external-link"
+                                        text
+                                        // onClick={() => window.open(selectedTask.file.filePath, "_blank")}
+                                        onClick={() => window.open(`http://localhost:2000/${selectedTask.file.filePath}`, '_blank')}
+
+                                    />
+                                    <Button
+                                        icon="pi pi-trash"
+                                        text
+                                        severity="danger"
+                                        onClick={() => setSelectedTask({ ...selectedTask, file: null })}
+                                    />
+                                </div>
+                            )}
+
+                            <FileUpload
+                                mode="basic"
+                                chooseLabel="upload new file"
+                                name="demo[]"
+                                url="/api/upload"
+                                maxFileSize={1000000}
+                                chooseOptions={{
+                                    style: {
+                                        width: '100%',
+                                        color: "green",
+                                        background: "white",
+                                        border: '1px solid green'
+                                    }
+                                }}
+                                onSelect={(e) => {
+                                    const newfile = e.files[0];
+                                    setSelectedTask({
+                                        ...selectedTask,
+                                        file: newfile
+                                    });
+                                }}
+                               
+                            />
                         </div>
                         <div className="flex align-items-center gap-2">
                             <Button label="Update" onClick={(e) => { hide(e); editTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
@@ -399,44 +476,49 @@ const DetailsCalander = (props) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                 }}
-            />          
-             <Dialog
+            />
+            <Dialog
                 header={`Chat With ${rowData.name}`}
                 visible={visible}
                 position="bottom-right"
-                style={{ width: '350px', height: '60vh',bottom: '60px'}}
+                style={{ width: '350px', height: '60vh', bottom: '60px' }}
                 onHide={() => setVisible(false)}
                 draggable={false}
                 resizable={false}
             >
-                {/* <Card style={{ height: '100%', display: 'fixed', flexDirection: 'column' }}> */}
-                    <ScrollPanel style={{ flex: '1', overflowY: 'auto', marginBottom: '10px' }}>
-                        {messages.map((msg, index) => (
-                            
-                            <div key={index} style={{ marginBottom: '10px' }}>
-                                {msg.timestamp}
-                                <div style={{
+                <ScrollPanel style={{ flex: '1', overflowY: 'auto', marginBottom: '10px' }}>
+                    {messages.map((msg, index) => (
+
+                        <div key={index} style={{ marginBottom: '10px' }}>
+                            {msg.timestamp}
+                            <div style={{
                                 padding: "5%",
-                                backgroundColor: msg.sender === manager.name ? '#dcdcdc' : '#f5f5f5', // אפור מאוד בהיר ואפור בהיר
-                                borderRadius: "5px" // פינות פחות מעוגלות
+                                backgroundColor: msg.sender === manager.name ? '#dcdcdc' : '#f5f5f5',
+                                borderRadius: "5px"
                             }}>
                                 {`${msg.sender}: ${msg.content}`}
                             </div>
-                            </div>
-                        ))}
-                        <div ref={messagesEndRef} />
-                    </ScrollPanel>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <InputText
-                            value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
-                            placeholder="Type your Message..."
-                            style={{ flex: '1', marginRight: '10px' }}
-                        />
-                        <Button label="Send" onClick={sendMessage} />
-                    </div>
+                        </div>
+                    ))}
+                    <div ref={messagesEndRef} />
+                </ScrollPanel>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <InputText
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        placeholder="Type your Message..."
+                        style={{ flex: '1', marginRight: '10px' }}
+                    />
+                    <Button label="Send" onClick={sendMessage} />
+                </div>
                 {/* </Card> */}
             </Dialog>
+            <div className="card">
+                {showDetails && <DetailsTask selectedTask={selectedTask} setShowDetails={setShowDetails} />}
+
+            </div>
+
+
         </>
     );
 };

@@ -6,7 +6,8 @@ import 'primeflex/primeflex.css';
 import 'primereact/resources/primereact.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import { BrowserRouter } from 'react-router-dom';
-
+import {Provider} from "react-redux"
+import { store } from './store/store'
 import './index.css';
 import './flags.css';
 import App from './App';
@@ -17,11 +18,14 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <PrimeReactProvider>
+        <Provider store={store}>
         <App />
+        </Provider>
       </PrimeReactProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
+
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

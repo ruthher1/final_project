@@ -8,9 +8,12 @@ import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
 import { useNavigate } from "react-router-dom";
 import { Dropdown } from "primereact/dropdown";
+import { useSelector } from "react-redux";
 
 export default function HeaderClient(props) {
-  const id = props.id || {}
+  // const id = props.id || {}
+      const id=useSelector(x=>x.Id.id)
+  
   const client=props.client||{}
   const setClient=props.setClient||{}
     const managers = props.managers || {}
@@ -40,7 +43,6 @@ export default function HeaderClient(props) {
         catch (err) {
           console.error(err)
         }
-        // setImage(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -70,23 +72,23 @@ export default function HeaderClient(props) {
     >
       <h2></h2>
       <h2></h2>
-      <div >
+      {/* <div >
             <Dropdown value={selectedManager} onChange={(e) => srtSelectedManager(e.value)} options={managers} optionLabel="managerid" 
                 placeholder="Select a Project" className="w-full md:w-14rem" />
-      </div>
+      </div> */}
 
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <span>{client.name}</span>
+        <span>{client.name?client.name.split(' ').map(name => name.charAt(0).toUpperCase() + name.slice(1)).join(' '):""}</span>
         <Button icon="pi pi-bell" className="p-button-rounded p-button-text p-button-secondary" />
         <Button icon="pi pi-envelope" className="p-button-rounded p-button-text p-button-secondary" />
-        <Button icon="pi pi-cog" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { navigate(`/client/${id}/settings`, { state: id}) }} />
-        <Button icon="pi pi-comment" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { navigate(`/client/${id}/chat`, { state: id}) }} />
+        <Button icon="pi pi-cog" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { navigate(`/client/${id}/settings`, { state: {client,setClient}}) }} />
+        {/* <Button icon="pi pi-comment" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { navigate(`/client/${id}/chat`, { state: id}) }} /> */}
 
         {/* <Avatar 
         label='a' size="large" shape="circle" /> */}
         <div>
           <Avatar
-            // label='a'
+            label={client.imageURL?"": client.name ? client.name[0]:""}
             size="large"
             shape="circle"
             onClick={handleAvatarClick}

@@ -1,6 +1,4 @@
 const User=require("../models/User")
-// const Organizer=require("../models/Organizer")
-//const Receiver=require("../models/Receiver")
 
 const bcrypt= require('bcrypt')
 const jwt= require('jsonwebtoken')

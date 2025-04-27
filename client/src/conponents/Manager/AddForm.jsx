@@ -6,6 +6,7 @@ import { Button } from "primereact/button";
 import { Avatar } from "primereact/avatar";
 import { Dropdown } from 'primereact/dropdown';
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 export default function AddForm(props) {
     const [selectedProject, setSelectedProject] = useState(null);
     const [projects, setProjects] = useState([]);
@@ -16,7 +17,9 @@ export default function AddForm(props) {
     address: "",
     email: "",
   });
-  const id=props.id || {}
+  // const id=props.id || {}
+  const id=useSelector(x=>x.Id.id)
+  
   const token = JSON.parse(localStorage.getItem('token')) || ""
   const navigate=useNavigate()
 
@@ -57,7 +60,7 @@ useEffect(() => {
     const res = await axios.post("http://localhost:2000/api/users/addClient", client,
             { headers: { Authorization: `Bearer ${token}` } })
         if (res.status === 200) {
-            navigate(`../manager/${id}` ,{state:{id,num:1}})
+            navigate(`../manager/${id}` ,{state:{num:1}})
        }
     }
     catch (err) {
