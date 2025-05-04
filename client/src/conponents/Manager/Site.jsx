@@ -15,9 +15,7 @@ import { useSelector } from 'react-redux';
 const Site = () => {
     const token = JSON.parse(localStorage.getItem('token')) || ""
     const location = useLocation();
-    // const id = location.state.id || {}
       const id=useSelector(x=>x.Id.id)
-    
     const num = location.state.num || 0
     const rowData = location.state.rowData || {}
     const [contacts, setContacts] = useState([]);
@@ -44,7 +42,6 @@ const Site = () => {
         <>
             <SideBar  contacts={contacts}  setContacts={setContacts} num={num} manager={manager} setManager={setManager}/>
             <div className="content">
-                {/* <Header id={id} /> */}
                 {num == 1 || num == 2 || num == 3 || num == 5 ? <Header  contacts={contacts} setContacts={setContacts} num={num} manager={manager} setManager={setManager}/> :null}
                 <>
                     {num === 1 ? <Body  contacts={contacts} num={num} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}

@@ -84,7 +84,7 @@ const TaskPage = (props) => {
             const res = await axios.put(`http://localhost:2000/api/tasks/completeTask`, { ...task, id: task._id, clientid: id },
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                setTasks(res.data.map((newtask) => { return { ...newtask, managername: newtask.connectionid.managerid.name } }));
+                setTasks(res.data.map((newtask) => { return { ...newtask, managername: newtask.connectionid.managerid.name,projectname:newtask.connectionid.projectid.name } }));
                 setTaskCompleted({})
             }
         }
@@ -140,6 +140,7 @@ const TaskPage = (props) => {
                             responsiveLayout="scroll"
                             className="p-datatable-gridlines">
                             <Column field="managername" header="Manager" style={{ minWidth: '120px' }} />
+                            <Column field="projectname" header="Project" style={{ minWidth: '120px' }} />
                             <Column field="title" header="Task" style={{ minWidth: '200px' }} />
                             <Column field="description" header="Description" body={(rowData) => rowData.description ? rowData.description : <>No Description</>} />
                             <Column header="File"
@@ -273,7 +274,8 @@ const TaskPage = (props) => {
                                 borderRadius: "5px",
                                 cursor: "pointer"
                             }}>
-                                {`${manager.managerid.name}`}
+                                 {`${manager.managerid.name}-${manager.projectid.name}`}
+
                             </div>
                         </div>
                     ))}
@@ -291,6 +293,8 @@ const TaskPage = (props) => {
                 onHide={() => { if (!showCompleted) return; setShowCompleted(false); }}
                 content={({ hide }) => (
                     <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
+                     <h2 style={{textAlign:'center'}}>Do you want to respond?</h2>
+
                         <div className="inline-flex flex-column gap-2">
                             <Dropdown
                                 style={{ textAlign: 'left' }}
@@ -298,7 +302,7 @@ const TaskPage = (props) => {
                                 onChange={(e) => { setTaskCompleted({ ...taskCompleted, difficulty: e.value }) }}
                                 options={["easy", "medium", "hard"]}
                                 placeholder="Rating"
-                                className="w-full md:w-14rem" />
+                                className="w-full" />
                         </div>
                         <div className="inline-flex flex-column gap-2">
                             <InputTextarea placeholder="write your comment hear...." value={taskCompleted.comment} disabled={!isToday} onChange={(e) => setTaskCompleted({ ...taskCompleted, comment: e.target.value })} />

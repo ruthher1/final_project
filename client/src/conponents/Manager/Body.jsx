@@ -12,7 +12,6 @@ import { useSelector } from "react-redux";
 
 export default function Body(props) {
     const navigate = useNavigate()
-    // const id = props.id || {}
     const id=useSelector(x=>x.Id.id)
     
     const contacts = props.contacts || {}

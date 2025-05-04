@@ -10,9 +10,10 @@ import Header from './Header';
 import { useLocation, useNavigate } from "react-router-dom";
 import { Calendar } from 'primereact/calendar';
 import { FileUpload } from "primereact/fileupload";
+import { Tooltip } from 'primereact/tooltip';
 
-import { ConfirmPopup } from 'primereact/confirmpopup'; // To use <ConfirmPopup> tag
-import { confirmPopup } from 'primereact/confirmpopup'; // To use confirmPopup method
+import { ConfirmPopup } from 'primereact/confirmpopup'; 
+import { confirmPopup } from 'primereact/confirmpopup'; 
 import { useSelector } from "react-redux";
 
 export default function Aaa(props) {
@@ -22,7 +23,6 @@ export default function Aaa(props) {
   const [isMobile, setIsMobile] = useState(false);
   const [visible, setVisible] = useState(false);
   const [show, setShow] = useState(false);
-  // const id = props.id || {}
   const id=useSelector(x=>x.Id.id)
   
   const [showAddTaskToAllClients, setShowAddTaskToAllClients] = useState(false);
@@ -175,7 +175,6 @@ export default function Aaa(props) {
   }, [])
 
   const items = [
-    { label: "Dashboard", icon: "pi pi-home", command: () => console.log("Dashboard Clicked") },
     {
       label: "Users",
       icon: "pi pi-users",
@@ -194,7 +193,8 @@ export default function Aaa(props) {
         },
         ...(isProjectsOpen ? projects.map(project => ({
           template: (item, options) => (
-            <div onClick={() => { showProjectContacts(project._id) }} style={{
+            <div className="highlight-div"
+            onClick={() => { showProjectContacts(project._id) }} style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -210,11 +210,15 @@ export default function Aaa(props) {
                 style={{ cursor: 'pointer', marginLeft: 'auto' }}
                 onClick={(e) => confirm(e, project._id)}
               />
+
+              <Tooltip target=".edit-icon" content="Add a task to the whole group" />
               <i
-                className="pi pi-pen-to-square"
+                className="pi pi-pen-to-square edit-icon"
                 style={{ cursor: 'pointer', marginLeft: '5px' }}
                 onClick={() => { setShowAddTaskToAllClients(true); setTaskToAllClients({ ...taskToAllClients, projectid: project._id }) }}
               />
+             
+
 
 
             </div>
@@ -233,7 +237,6 @@ export default function Aaa(props) {
   return (
     <>
       <div className="app-container">
-        {/* Sidebar קבוע במסכים גדולים */}
         {!isMobile && (
           <div className="sidebar">
             <h2>Menu</h2>
@@ -241,7 +244,6 @@ export default function Aaa(props) {
           </div>
         )}
 
-        {/* כפתור לפתיחת ה-Sidebar במסכים קטנים */}
         {isMobile && (
           <Button
             icon="pi pi-bars"
@@ -250,18 +252,18 @@ export default function Aaa(props) {
           />
         )}
 
-        {/* Sidebar במסכים קטנים */}
         <Sidebar visible={visible} onHide={() => setVisible(false)} className="p-sidebar-md">
           <h2>Menu</h2>
           <Menu model={items} className="w-full" />
         </Sidebar>
       </div>
-      <Dialog
+      <Dialog   
         visible={show}
         modal
         onHide={() => { if (!show) return; setShow(false); }}
         content={({ hide }) => (
           <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
+            <h2 style={{textAlign:'center'}}>Add a new project</h2>
             <div className="inline-flex flex-column gap-2">
               <InputText onChange={(e) => setProjectname(e.target.value)} className="input-focus" placeholder="Project Name" id="projectname" label="Projectname" type="text"></InputText>
             </div>
@@ -279,6 +281,8 @@ export default function Aaa(props) {
         onHide={() => { if (!showAddTaskToAllClients) return; setShowAddTaskToAllClients(false); }}
         content={({ hide }) => (
           <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
+          <h2 style={{textAlign:'center'}}>Add a task to the whole group</h2>
+
             <div className="inline-flex flex-column gap-2">
               <InputText onChange={(e) => setTaskToAllClients({ ...taskToAllClients, title: e.target.value })} className="input-focus" placeholder="Task Title" id="title" label="Task Title" type="text"></InputText>
             </div>
@@ -292,17 +296,6 @@ export default function Aaa(props) {
               <FileUpload chooseLabel="Upload Files"
                 chooseOptions={{ style: { width: '100%', color: "green", background: "white", border: '1px solid green' } }}
                 mode="basic" name="demo[]" url="/api/upload" maxFileSize={1000000}
-                // onSelect={(e) => {
-                //   const file = e.files[0];
-                //   setTaskToAllClients({
-                //     ...taskToAllClients, file: {
-                //       filePath: file.objectURL,
-                //       fileName: file.name,
-                //       fileSize: file.size,
-                //       fileType: file.type
-                //     }
-                //   })
-                // }}
                 onSelect={(e) => {
                   const newfile = e.files[0];
                   setTaskToAllClients({ ...taskToAllClients, file: newfile})

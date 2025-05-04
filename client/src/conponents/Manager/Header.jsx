@@ -13,13 +13,11 @@ export default function Header(props) {
   const manager = props.manager || {}
   const setManager = props.setManager || {}
 
-  // const id = props.id || {}
       const id=useSelector(x=>x.Id.id)
   
   const token = JSON.parse(localStorage.getItem('token')) || ""
   const num = props.num || {}
   const navigate = useNavigate()
-  // const [image, setImage] = useState(null);
   const contacts = props.contacts || [];
   const [coppyContacts, setCoppyContacts] = useState([]);
   useEffect(() => {
@@ -49,7 +47,6 @@ export default function Header(props) {
         catch (err) {
           console.error(err)
         }
-        // setImage(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -95,9 +92,8 @@ export default function Header(props) {
 
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <span>{ manager.name?manager.name.split(' ').map(name => name.charAt(0).toUpperCase() + name.slice(1)).join(' '):""}</span>
-        <Button icon="pi pi-bell" className="p-button-rounded p-button-text p-button-secondary" />
-        <Button icon="pi pi-envelope" className="p-button-rounded p-button-text p-button-secondary" />
-        <Button icon="pi pi-user" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { num == 1 ? navigate(0, { state: { num: 1 } }) : navigate(`/manager/${id}`, { state: { num: 1 } }) }} />
+        <Button icon="pi pi-sign-out" className="p-button-rounded p-button-text p-button-secondary" onClick={() => {localStorage.removeItem("token");navigate(`/`, ) }} />
+        <Button icon="pi pi-users" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { num == 1 ? navigate(0, { state: { num: 1 } }) : navigate(`/manager/${id}`, { state: { num: 1 } }) }} />
         <Button icon="pi pi-cog" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { navigate(`/manager/${id}/settings`, { state: { num: 4 } }) }} />
       
         <div>

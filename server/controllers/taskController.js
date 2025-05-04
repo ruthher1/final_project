@@ -9,7 +9,7 @@ const addTask = async (req, res) => {
     const { title, description, managerid, clientid, projectid, date } = req.body
     const file=req.file
     if (!title || !managerid || !clientid || !projectid || !date) {
-        return res.status(400).send("title connectionid date are required")
+        return res.status(400).send("title clientid managerid projectid date are required")
     }
     // console.log(req.file)
     let fileExists=null
@@ -63,17 +63,6 @@ const getTask = async (req, res) => {
     res.json(task)
 }
 
-const getTasksManager = async (req, res) => {
-    // const { connectionid } = req.body
-    // if (!connectionid) {
-    //     return res.status(400).send("connectionid is required")
-    // }
-    // const tasks = await Task.find({ connectionid }).lean()
-    // if (!tasks) {
-    //     return res.status(400).send("tasks not found")
-    // }
-    // res.json(tasks)
-}
 
 const getTasksClient = async (req, res) => {
     const { projectid, managerid, clientid } = req.params
@@ -91,30 +80,6 @@ const getTasksClient = async (req, res) => {
     res.json(tasks)
 }
 
-// const getTasks = async (req, res) => {
-//     try {
-//         const { clientid } = req.params;
-//         if (!clientid) {
-//             return res.status(400).send("clientid is required");
-//         }
-//         const connections = await Connection.find({ clientid }).lean();
-//         if (!connections) {
-//             return res.status(400).send("Connections not found");
-//         }
-
-//         const allTasks = await Promise.all(connections.map(async (connection) => {
-//             return await Task.find({ connectionid: connection._id }).populate("connectionid").populate("file").lean();
-//         }));
-
-//         res.json(allTasks);
-
-
-
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).send("Server error");
-//     }
-// };
 const getTasks = async (req, res) => {
     const { clientid } = req.params;
     if (!clientid) {
@@ -125,10 +90,7 @@ const getTasks = async (req, res) => {
         return res.status(400).send("Connections not found");
     }
     const connectionIds = connections.map(c => c._id);
-    // const allTasks = await (await Task.find({ connectionid: { $in: connectionIds } }).populate("connectionid")).populate('mananagerid').populate("file").lean();
-    const allTasks = await Task.find({ connectionid: { $in: connectionIds } }).populate({path: "connectionid",populate: {path: "managerid"  }}) .populate("file") .lean();
-
-
+    const allTasks = await Task.find({ connectionid: { $in: connectionIds } }).populate({  path: "connectionid",  populate: [ { path: "managerid" }, { path: "projectid" }]})  .populate("file").lean();
     res.json(allTasks);
 };
 
@@ -169,9 +131,7 @@ const updateTask = async (req, res) => {
             }
         }
 
-        // if (!file.fileName || !file.filePath || !file.fileSize || !file.fileType) {
-        //     return res.status(400).send("name type size path are required")
-        // }
+      
         if (!file.originalname || !file.path || !file.size || !file.mimetype) {
             return res.status(400).send("name type size path are required")
         }
@@ -213,18 +173,12 @@ const completeTask = async (req, res) => {
     if (!newTask) {
         return res.status(400).send("task not updated")
     }
-    // const tasks = await Task.find({ connectionid: task.connectionid }).populate({path: "connectionid",populate: {path: "managerid"  }}).populate("file").lean();
-    // if (!tasks) {
-    //     return res.status(400).send("tasks not found")
-    // }
-    // res.json(tasks)
     const connections = await Connection.find({clientid}).lean();
     if (!connections.length) {
         return res.status(400).send("Connections not found");
     }
     const connectionIds = connections.map(c => c._id);
-    // const allTasks = await (await Task.find({ connectionid: { $in: connectionIds } }).populate("connectionid")).populate('mananagerid').populate("file").lean();
-    const allTasks = await Task.find({ connectionid: { $in: connectionIds } }).populate({path: "connectionid",populate: {path: "managerid"  }}) .populate("file") .lean();
+    const allTasks = await Task.find({ connectionid: { $in: connectionIds } }).populate({  path: "connectionid",  populate: [ { path: "managerid" }, { path: "projectid" }]})  .populate("file").lean();
     if (!allTasks) {
         return res.status(400).send("tasks not found")
     }
@@ -267,4 +221,4 @@ const deleteTask = async (req, res) => {
     res.json(tasks)
 }
 
-module.exports = { getTasks, addTask, getTask, getTasksManager, updateTask, deleteTask, completeTask, getTasksClient }
+module.exports = { getTasks, addTask, getTask, updateTask, deleteTask, completeTask, getTasksClient }

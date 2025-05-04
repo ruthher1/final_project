@@ -214,3 +214,25 @@ th {
 .custom-icon-button .pi {
   font-size: 1.8rem; /* ניתן להגדיל כרצונך */
 }
+
+.highlight-div {
+  transition: all 0.3s ease;  /* הוספת אפקט של מעבר חלק */
+}
+
+.highlight-div:hover {
+  background-color: var(--surface-200);   /* צבע רקע צהוב כשהעכבר מעל */
+}
+.custom-button {
+  background-color: #4CAF50; 
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}

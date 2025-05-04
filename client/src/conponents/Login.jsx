@@ -8,7 +8,6 @@ import axios from 'axios'
 import { RadioButton } from "primereact/radiobutton";
 import { useDispatch, useSelector } from "react-redux"
 
-// import myfamily from '../pictures/family.png'
 
 
 const Login = () => {
@@ -24,7 +23,6 @@ const Login = () => {
             const res = await axios.post('http://localhost:2000/api/login', { userid: valueId, password: valuePass, role: valueRole })
             if (res.status === 200) {
                 localStorage.setItem("token", JSON.stringify(res.data.accessToken))
-                // valueRole === "manager" ? navigate(`./manager/${res.data.id}`, { state: {id:res.data.id,num:1} }) : navigate(`./client/${res.data.id}`, { state: {id:res.data.id} })
                 dispatch({type:"fill",payload:res.data.id})
                 valueRole === "manager" ? navigate(`./manager/${res.data.id}`, { state: {num:1} }) : navigate(`./client/${res.data.id}`)
 
@@ -41,7 +39,6 @@ const Login = () => {
         <>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
                 <Card title="Task Track" subTitle="LogIn" className="md:w-30rem custom-card p-card-subtitle"  >
-                    {/* <img src={myfamily} alt="My Image" style={{ width: '50px', height: '50px' }} />          */}
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
                         <div className="flex flex-wrap justify-content-center align-items-center gap-2">
                             <label className="w-6rem">UserID</label>

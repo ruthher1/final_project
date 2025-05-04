@@ -76,8 +76,7 @@ const getManagerClients = async (req, res) => {
     const clients = await Connection.find({ managerid: id }).populate("clientid").populate("projectid").lean()
     if (!clients)
         return res.status(400).send("clients not found")
-    const uniqueArray = [...new Set(clients)];
-    res.json(uniqueArray)
+    res.json(clients)
 
 }
 const getClientManagers=async(req,res)=>{
@@ -86,11 +85,10 @@ const getClientManagers=async(req,res)=>{
         {
             return res.status(400).send("id is requiered")
         }
-    const managers = await Connection.find({ clientid: id}).populate("managerid").lean()
+    const managers = await Connection.find({ clientid: id}).populate("managerid").populate("projectid").lean()
     if (!managers)
         return res.status(400).send("managers not found")
-    const uniqueArray = [...new Set(managers)];
-    res.json(uniqueArray)
+    res.json(managers)
 }
 const getClient = async (req, res) => {
     const { id, projectid } = req.body
@@ -215,8 +213,7 @@ const deleteClient = async (req, res) => {
     if (!clients)
         return res.status(400).send("clients not found")
 
-    const uniqueArray = [...new Set(clients)];
-    res.json(uniqueArray)
+    res.json(clients)
 }
 
 const addImage = async (req, res) => {

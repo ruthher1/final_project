@@ -17,7 +17,6 @@ export default function AddForm(props) {
     address: "",
     email: "",
   });
-  // const id=props.id || {}
   const id=useSelector(x=>x.Id.id)
   
   const token = JSON.parse(localStorage.getItem('token')) || ""

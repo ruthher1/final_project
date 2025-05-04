@@ -20,13 +20,7 @@ const io = socketIo(server,{
         methods: ["GET", "POST"]
     }
 });
-// const io = socketIo(server, {
-//     transports: ['websocket', 'polling'],  // תומך ב-WebSocket ו-Polling
-//     cors: {
-//         origin: "http://localhost:3000",
-//         methods: ["GET", "POST"]
-//     }
-// });
+
 const bodyParser = require("body-parser");
 
 app.use(bodyParser.json({ limit: "50mb" }));
@@ -44,7 +38,6 @@ app.use("/api/projects", require("./routes/project"));
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB");
   
-  // Start server on the specified port
   server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });

@@ -9,20 +9,19 @@ import { FileUpload } from "primereact/fileupload";
 import { useNavigate } from "react-router-dom";
 import { Dropdown } from "primereact/dropdown";
 import { useSelector } from "react-redux";
+import Settings from "./Settings";
 
 export default function HeaderClient(props) {
-  // const id = props.id || {}
-      const id=useSelector(x=>x.Id.id)
-  
+  const id=useSelector(x=>x.Id.id)
   const client=props.client||{}
   const setClient=props.setClient||{}
-    const managers = props.managers || {}
-    const[selectedManager,srtSelectedManager]=useState({})
+  const managers = props.managers || {}
+  const[selectedManager,srtSelectedManager]=useState({})
     const tasks = props.tasks || {}
     const setTasks = props.setTasks || {} 
      const token = JSON.parse(localStorage.getItem('token')) || ""
   const navigate = useNavigate()
-  // const [image, setImage] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   const handleAvatarClick = () => {
     document.getElementById("fileInput").click();
@@ -71,21 +70,10 @@ export default function HeaderClient(props) {
       }}
     >
       <h2></h2>
-      <h2></h2>
-      {/* <div >
-            <Dropdown value={selectedManager} onChange={(e) => srtSelectedManager(e.value)} options={managers} optionLabel="managerid" 
-                placeholder="Select a Project" className="w-full md:w-14rem" />
-      </div> */}
-
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <span>{client.name?client.name.split(' ').map(name => name.charAt(0).toUpperCase() + name.slice(1)).join(' '):""}</span>
-        <Button icon="pi pi-bell" className="p-button-rounded p-button-text p-button-secondary" />
-        <Button icon="pi pi-envelope" className="p-button-rounded p-button-text p-button-secondary" />
-        <Button icon="pi pi-cog" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { navigate(`/client/${id}/settings`, { state: {client,setClient}}) }} />
-        {/* <Button icon="pi pi-comment" className="p-button-rounded p-button-text p-button-secondary" onClick={() => { navigate(`/client/${id}/chat`, { state: id}) }} /> */}
-
-        {/* <Avatar 
-        label='a' size="large" shape="circle" /> */}
+        <Button icon="pi pi-sign-out" className="p-button-rounded p-button-text p-button-secondary" onClick={() => {localStorage.removeItem("token");navigate(`/`, ) }} />
+        <Button icon="pi pi-cog" className="p-button-rounded p-button-text p-button-secondary" onClick={() => setShowSettings(true)} />
         <div>
           <Avatar
             label={client.imageURL?"": client.name ? client.name[0]:""}
@@ -110,7 +98,12 @@ export default function HeaderClient(props) {
         </div>
       </div>
 
-    </div>
+     
+    </div> 
+    <div className="card">
+                {showSettings && <Settings client={client} setClient={setClient} setShowSettings={setShowSettings}/>}
+
+          </div>
 
     </>
   );

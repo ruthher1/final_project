@@ -9,7 +9,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export default function UpdateForm(props) {
-  // const id = props.id || {}
       const id=useSelector(x=>x.Id.id)
   
   const rowData = props.rowData || {}
@@ -31,7 +30,6 @@ export default function UpdateForm(props) {
     e.preventDefault();
     const client = {
       ...contact,
-      //   managerid: id,
     };
     try {
       const res = await axios.put("http://localhost:2000/api/users/updateUser", client,

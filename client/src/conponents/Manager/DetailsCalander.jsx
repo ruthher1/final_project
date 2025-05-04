@@ -19,11 +19,7 @@ import { useSelector } from 'react-redux';
 
 
 const DetailsCalander = (props) => {
-    // const contacts = props.contacts || {}
-    // console.log(contacts)
-    // const id = props.id || {}
-     const id=useSelector(x=>x.Id.id)
-    
+    const id=useSelector(x=>x.Id.id)
     const rowData = props.rowData || {}
     const [date, setDate] = useState(new Date());
     const [showAdd, setShowAdd] = useState(false);
@@ -68,14 +64,8 @@ const DetailsCalander = (props) => {
 
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
-    // const toastFile = useRef(null);
     const messagesEndRef = useRef(null)
     const socket = io('http://localhost:2000');
-
-    // const onUpload = () => {
-    //     toast.current.show({ severity: 'info', summary: 'Success', detail: 'File Uploaded' });
-    // };
-
 
     useEffect(() => {
         const socket = io('http://localhost:2000');
@@ -227,7 +217,6 @@ const DetailsCalander = (props) => {
             const res = await axios.delete(`http://localhost:2000/api/tasks/deleteTask/${taskid}`,
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                // const tasksData = res.data.map((task) => { return task })
                 setTasks(res.data)
 
             }
@@ -292,11 +281,9 @@ const DetailsCalander = (props) => {
                         </thead>
                         <tbody>
 
-                            {/* כאן תוכל להוסיף שורות נוספות לתוכן של כל יום */}
                             <tr>
                                 {daysOfWeek.map((day) => {
                                     const filteredTasks = tasks.filter((ta) => {
-                                        // console.log("aaa" + dateFormat(new Date(ta.date)))
                                         return dateFormat(new Date(ta.date)) === dateFormat(day)
 
                                     })
@@ -347,10 +334,14 @@ const DetailsCalander = (props) => {
                             <tr>
                                 {daysOfWeek.map((day) => (
                                     <td key={day.getTime()} className="day-cell">
-                                        <Button label="Add Task" onClick={() => {
+                                        <Button 
+                                    disabled={day.setHours(0,0,0,0) < new Date().setHours(0,0,0,0)}     
+                                   label="Add Task" onClick={() => {
                                             setShowAdd(true);
                                             ; setTask({ ...task, date: myFormat(day) })
-                                        }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+                                        }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}>
+
+                                        </Button>
                                     </td>
                                 ))}
                             </tr>
@@ -364,6 +355,8 @@ const DetailsCalander = (props) => {
                 onHide={() => { if (!showAdd) return; setShowAdd(false); }}
                 content={({ hide }) => (
                     <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
+                    <h2 style={{textAlign:'center'}}>Add a new task</h2>
+
                         <div className="inline-flex flex-column gap-2">
                             <InputText onChange={(e) => setTask({ ...task, title: e.target.value })} className="input-focus" placeholder="Task Name" label="TaskName" type="text" required></InputText>
                         </div>
@@ -394,6 +387,7 @@ const DetailsCalander = (props) => {
                 onHide={() => { if (!showEdit) return; setShowEdit(false); }}
                 content={({ hide }) => (
                     <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
+            <h2 style={{textAlign:'center'}}>Add the task</h2>
 
                         <div className="inline-flex flex-column gap-2">
                             <InputText value={selectedTask.title} onChange={(e) => setSelectedTask({ ...selectedTask, title: e.target.value })} className="input-focus" placeholder="Task Name" label="TaskName" type="text" required></InputText>
@@ -411,7 +405,6 @@ const DetailsCalander = (props) => {
                                     <Button
                                         icon="pi pi-external-link"
                                         text
-                                        // onClick={() => window.open(selectedTask.file.filePath, "_blank")}
                                         onClick={() => window.open(`http://localhost:2000/${selectedTask.file.filePath}`, '_blank')}
 
                                     />

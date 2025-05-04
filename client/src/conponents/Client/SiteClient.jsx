@@ -12,7 +12,6 @@ const SiteClient = () => {
 
     const token = JSON.parse(localStorage.getItem('token')) || ""
     const location = useLocation();
-    // const { id } = location.state || {}
     const id=useSelector(x=>x.Id.id)
     
     const [managers, setManagers] = useState([])
@@ -24,6 +23,7 @@ const SiteClient = () => {
             { headers: { Authorization: `Bearer ${token}` } })
           if (res.status === 200) {
             setClient(res.data)
+
           }
         }
         catch (err) {
@@ -58,7 +58,7 @@ const SiteClient = () => {
             const res = await axios.get(`http://localhost:2000/api/tasks/getTasks/${id}`,
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                setTasks(res.data.map((task) => { return { ...task, managername: task.connectionid.managerid.name } }))
+                setTasks(res.data.map((task) => { return { ...task, managername: task.connectionid.managerid.name,projectname:task.connectionid.projectid.name  } }))
             }
         }
         catch (err) {
@@ -75,10 +75,9 @@ const SiteClient = () => {
    
     return (
         <>
-            <div style={{ margin: "5%" }} >
-
-                <HeaderClient id={id} managers={managers} tasks={tasks} setTasks={setTasks} client={client} setClient={setClient}/>
-                <TaskPage id={id}  managers={managers} tasks={tasks} setTasks={setTasks} client={client}/>
+               <div style={{ marginLeft: "5%",marginRight: "5%",marginButtom: "5%" }}>
+                <HeaderClient  managers={managers} tasks={tasks} setTasks={setTasks} client={client} setClient={setClient}/>
+                <TaskPage   managers={managers} tasks={tasks} setTasks={setTasks} client={client}/>
             </div>
         </>
 

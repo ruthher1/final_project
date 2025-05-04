@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Card } from 'primereact/card';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
@@ -7,24 +7,25 @@ import { TabView, TabPanel } from 'primereact/tabview';
 import { User, Mail, Phone, Lock,MapPin  } from 'lucide-react';
 import axios from "axios"
 import { useSelector } from 'react-redux';
+import { Toast } from 'primereact/toast'; 
 
 
 export default function Settings(props) {
     const token = JSON.parse(localStorage.getItem('token')) || ""
-    // const id=props.id||{}
-      const id=useSelector(x=>x.Id.id)
-    
-    // const manager=props.manager||{}
-    // const setManager=props.setManager||{}
+    const id=useSelector(x=>x.Id.id)
     const manager = props.manager || {}
     const setManager = props.setManager || {}
+    const [newManager, setNewManager] = useState(manager)
+    const toast = useRef(null)
+    
 const updateUser=async()=>{
 
     try {
-        const res = await axios.put(`http://localhost:2000/api/users/updateUser`,{...manager,id:manager._id},
+        const res = await axios.put(`http://localhost:2000/api/users/updateUser`,{...newManager,id:manager._id},
           { headers: { Authorization: `Bearer ${token}` } })
         if (res.status === 200) {
-        alert("updated")
+        setManager(res.data)
+        toast.current.show({ severity: 'success', summary: 'Updated', detail: "manager details updated", life: 3000 });
         }
       }
       catch (err) {
@@ -33,10 +34,11 @@ const updateUser=async()=>{
     }
 const changePassword=async()=>{
     try {
-        const res = await axios.put(`http://localhost:2000/api/users/changePassword`,{id:manager._id,password:manager.password,newpassword:manager.newpassword},
+        const res = await axios.put(`http://localhost:2000/api/users/changePassword`,{id:manager._id,password:newManager.password,newpassword:newManager.newpassword},
           { headers: { Authorization: `Bearer ${token}` } })
         if (res.status === 200) {
-        alert("updated")
+            setManager(res.data)
+            toast.current.show({ severity: 'success', summary: 'Updated', detail: "manager password updated", life: 3000 });
         }
       }
       catch (err) {
@@ -46,7 +48,7 @@ const changePassword=async()=>{
 
     const handleChange = (e) => {
         
-        setManager({ ...manager, [e.target.name]: e.target.value });
+        setNewManager({ ...newManager, [e.target.name]: e.target.value });
     };
 
     return (
@@ -62,20 +64,21 @@ const changePassword=async()=>{
                         <div >
                             <div className="flex align-items-center mb-4">
                                 <User size={18} className="mr-2" />
-                                <InputText name="name" value={manager.name} onChange={handleChange} style={{ width: '50%' }} />
+                                <InputText name="name" value={newManager.name} onChange={handleChange} style={{ width: '50%' }} />
                             </div>
                             <div className="flex align-items-center mb-4">
                                 <Mail size={18} className="mr-2" />
-                                <InputText name="email" value={manager.email} onChange={handleChange} style={{ width: '50%' }} />
+                                <InputText name="email" value={newManager.email} onChange={handleChange} style={{ width: '50%' }} />
                             </div>
                             <div className="flex align-items-center mb-4">
                                 <Phone size={18} className="mr-2" />
-                                <InputText name="phone" value={manager.phone} onChange={handleChange} style={{ width: '50%' }}  />
+                                <InputText name="phone" value={newManager.phone} onChange={handleChange} style={{ width: '50%' }}  />
                             </div>
                             <div className="flex align-items-center mb-4">
                                 <MapPin  size={18} className="mr-2" />
-                                <InputText name="address" value={manager.address} onChange={handleChange} style={{ width: '50%' }}  />
+                                <InputText name="address" value={newManager.address} onChange={handleChange} style={{ width: '50%' }}  />
                             </div>
+                            <Toast ref={toast} /> 
                             <Button className="input-focus" label="Save Changes" style={{ width: '20%' ,marginLeft:"2.3%",color: "green", background: "white", border: '1px solid green'}} onClick={updateUser} />
                         </div>
                     </Card>
@@ -92,6 +95,7 @@ const changePassword=async()=>{
                                 <Lock size={18} className="mr-2" />
                                 <InputText type="password" placeholder="New Password" name="newpassword" onChange={handleChange}style={{ width: '50%' }}  />
                             </div>
+                            <Toast ref={toast} /> 
                             <Button className="input-focus" label="Update Password" style={{ width: '20%' ,marginLeft:"2.3%",color: "green", background: "white", border: '1px solid green'}} onClick={changePassword} />
                         </div>
                     </Card>

@@ -47,7 +47,6 @@ const DatailsTask = (props) => {
                                 icon="pi pi-eye"
                                 text
                                 tooltip="Show File"
-                                // onClick={() => window.open(task.file.filePath, '_blank')}
                                 onClick={() => window.open(`http://localhost:2000/${task.file.filePath}`, '_blank')}
 
                             />
