@@ -34,6 +34,8 @@ app.use("/api/users", require("./routes/user"));
 app.use("/api/tasks", require("./routes/task"));
 app.use("/api/login", require("./routes/login"));
 app.use("/api/projects", require("./routes/project"));
+//email
+app.use('/api/email', require("./routes/emailRoutes"));
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB");

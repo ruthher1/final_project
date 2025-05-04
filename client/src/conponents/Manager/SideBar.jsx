@@ -230,7 +230,7 @@ export default function Aaa(props) {
     },
     { label: "Analytics", icon: "pi pi-chart-bar", command: () => console.log("Analytics Clicked") },
     { label: "Settings", icon: "pi pi-cog", command: () => navigate(`/manager/${id}/settings`, { state: {  num: 4 } }) },
-    { label: "Help", icon: "pi pi-question", command: () => console.log("Help Clicked") },
+    { label: "Help", icon: "pi pi-question", command: () => navigate(`/manager/${id}/help`, { state: {  num: 6} }) },
 
   ];
 

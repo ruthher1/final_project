@@ -10,7 +10,7 @@ import axios from "axios"
 
 import { useState,useEffect } from 'react';
 import { useSelector } from 'react-redux';
-
+import Help from './HelpPage';
 
 const Site = () => {
     const token = JSON.parse(localStorage.getItem('token')) || ""
@@ -36,20 +36,23 @@ const Site = () => {
     
   useEffect(() => {
     getManager();
+    console.log("num",num)
   }
     , [])
     return (
         <>
             <SideBar  contacts={contacts}  setContacts={setContacts} num={num} manager={manager} setManager={setManager}/>
             <div className="content">
-                {num == 1 || num == 2 || num == 3 || num == 5 ? <Header  contacts={contacts} setContacts={setContacts} num={num} manager={manager} setManager={setManager}/> :null}
+                {num == 1 || num == 2 || num == 3 || num == 5 ||num==6? <Header  contacts={contacts} setContacts={setContacts} num={num} manager={manager} setManager={setManager}/> :null}
                 <>
                     {num === 1 ? <Body  contacts={contacts} num={num} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}
                     {num === 2 ? <AddForm  contacts={contacts} num={num} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}
                     {num === 3 ? <UpdateForm contacts={contacts} num={num} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}
                     {num === 4 ? <Settings  contacts={contacts} num={num} setContacts={setContacts}manager={manager} setManager={setManager} /> : null}
                     {num === 5 ? <DetailsCalander  contacts={contacts} num={num} rowData={rowData} setContacts={setContacts} manager={manager} setManager={setManager}/> : null}
-                    {num !== 1 && num !==2 && num !== 3 && num !== 4 && num !== 5 ? <p>num: {num}</p> : null}
+                    {num === 6 ? <Help   num={num} manager={manager} setManager={setManager}/> : null}
+
+                    {num !== 1 && num !==2 && num !== 3 && num !== 4 && num !== 5 && num !== 6? <p>num: {num}</p> : null}
                 </>
             </div>
 
