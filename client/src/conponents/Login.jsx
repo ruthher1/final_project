@@ -7,7 +7,8 @@ import { Card } from 'primereact/card';
 import axios from 'axios'
 import { RadioButton } from "primereact/radiobutton";
 import { useDispatch, useSelector } from "react-redux"
-
+import { Toast } from 'primereact/toast';
+import { useRef } from "react";
 
 
 const Login = () => {
@@ -17,7 +18,9 @@ const Login = () => {
     const navigate = useNavigate()
     const id=useSelector(x=>x.Id.id)
     const dispatch=useDispatch()
+    const toast = useRef(null);
 
+  
     const log_in = async () => {
         try {
             const res = await axios.post('http://localhost:2000/api/login', { userid: valueId, password: valuePass, role: valueRole })
@@ -30,7 +33,7 @@ const Login = () => {
         }
         catch (error) {
             console.error(error)
-            alert("Invalid User or Password")
+            toast.current.show({severity:'error', summary: 'Error', detail:error.response.data, life: 3000});
         }
 
     }
@@ -38,6 +41,7 @@ const Login = () => {
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
+            <Toast ref={toast} />
                 <Card title="Task Track" subTitle="LogIn" className="md:w-30rem custom-card p-card-subtitle"  >
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
                         <div className="flex flex-wrap justify-content-center align-items-center gap-2">

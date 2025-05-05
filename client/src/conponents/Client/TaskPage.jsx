@@ -308,7 +308,10 @@ const TaskPage = (props) => {
                             <InputTextarea placeholder="write your comment hear...." value={taskCompleted.comment} disabled={!isToday} onChange={(e) => setTaskCompleted({ ...taskCompleted, comment: e.target.value })} />
                         </div>
                         <div className="flex align-items-center gap-2">
-                            <Button label="Send" onClick={(e) => { hide(e); updateTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+{  taskCompleted.comment||taskCompleted.dictionary?
+<Button label="Send" onClick={(e) => { hide(e); updateTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+:<Button disabled label="Send" onClick={(e) => { hide(e); updateTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+}                        
                             <Button label="No" onClick={(e) => { hide(e); setTaskCompleted({}); updateTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
                         </div>
                     </div>

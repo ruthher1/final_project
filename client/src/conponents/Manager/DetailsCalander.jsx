@@ -19,7 +19,7 @@ import { useSelector } from 'react-redux';
 
 
 const DetailsCalander = (props) => {
-    const id=useSelector(x=>x.Id.id)
+    const id = useSelector(x => x.Id.id)
     const rowData = props.rowData || {}
     const [date, setDate] = useState(new Date());
     const [showAdd, setShowAdd] = useState(false);
@@ -123,8 +123,8 @@ const DetailsCalander = (props) => {
             const res = await axios.get(`http://localhost:2000/api/tasks/getTasksClient/${id}/${rowData.projectid}/${rowData._id}`,
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                const tasksData = res.data.map((task) => { return task })
-                setTasks(tasksData)
+                // const tasksData = res.data.map((task) => { return task })
+                setTasks(res.data)
             }
         }
         catch (err) {
@@ -186,12 +186,12 @@ const DetailsCalander = (props) => {
         formData.append("managerid", task.managerid);
         formData.append("clientid", task.clientid);
         formData.append("projectid", task.projectid);
-        if(task.description) {
-        formData.append("description", task.description);
+        if (task.description) {
+            formData.append("description", task.description);
         }
         formData.append("file", task.file);
         try {
-             const res = await axios.post(`http://localhost:2000/api/tasks/addTask`, formData,
+            const res = await axios.post(`http://localhost:2000/api/tasks/addTask`, formData,
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
                 setTasks(res.data)
@@ -231,15 +231,15 @@ const DetailsCalander = (props) => {
         formData.append("title", selectedTask.title);
         formData.append("file", selectedTask.file);
         formData.append("id", selectedTask._id);
-        if(selectedTask.description) {
-        formData.append("description", selectedTask.description);
+        if (selectedTask.description) {
+            formData.append("description", selectedTask.description);
         }
         try {
             const res = await axios.put(`http://localhost:2000/api/tasks/updateTask`, formData,
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                const dataTasks = res.data.map((task) => { return task })
-                setTasks(dataTasks)
+                // const dataTasks = res.data.map((task) => { return task })
+                setTasks(res.data)
             }
         }
         catch (err) {
@@ -268,7 +268,7 @@ const DetailsCalander = (props) => {
                             <i className="pi pi-chevron-right"></i>
                         </button>
                     </div>
-                    <table> 
+                    <table>
                         <thead>
                             <tr>
                                 {daysOfWeek.map((day) => (
@@ -334,12 +334,12 @@ const DetailsCalander = (props) => {
                             <tr>
                                 {daysOfWeek.map((day) => (
                                     <td key={day.getTime()} className="day-cell">
-                                        <Button 
-                                    disabled={day.setHours(0,0,0,0) < new Date().setHours(0,0,0,0)}     
-                                   label="Add Task" onClick={() => {
-                                            setShowAdd(true);
-                                            ; setTask({ ...task, date: myFormat(day) })
-                                        }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}>
+                                        <Button
+                                            disabled={day.setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)}
+                                            label="Add Task" onClick={() => {
+                                                setShowAdd(true);
+                                                ; setTask({ ...task, date: myFormat(day) })
+                                            }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}>
 
                                         </Button>
                                     </td>
@@ -355,7 +355,7 @@ const DetailsCalander = (props) => {
                 onHide={() => { if (!showAdd) return; setShowAdd(false); }}
                 content={({ hide }) => (
                     <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
-                    <h2 style={{textAlign:'center'}}>Add a new task</h2>
+                        <h2 style={{ textAlign: 'center' }}>Add a new task</h2>
 
                         <div className="inline-flex flex-column gap-2">
                             <InputText onChange={(e) => setTask({ ...task, title: e.target.value })} className="input-focus" placeholder="Task Name" label="TaskName" type="text" required></InputText>
@@ -369,13 +369,27 @@ const DetailsCalander = (props) => {
                                 mode="basic" name="demo[]" url="/api/upload" maxFileSize={1000000}
                                 onSelect={(e) => {
                                     const newfile = e.files[0];
-                                    setTask({ ...task, file: newfile})
+                                    setTask({ ...task, file: newfile })
                                 }}
                             />
                         </div>
                         <div className="flex align-items-center gap-2">
-                            <Button label="Add" onClick={(e) => { hide(e); addTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
-                            <Button label="Cancel" onClick={(e) => hide(e)} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
+{ task.title? 
+<Button label="Add" onClick={(e) => { hide(e); addTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+:<Button disabled label="Add" onClick={(e) => { hide(e); addTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+
+}                            <Button label="Cancel" onClick={(e) => {
+                                hide(e); setTask({
+                                    title: "",
+                                    description: "",
+                                    managerid: id,
+                                    projectid: rowData.projectid,
+                                    clientid: rowData._id,
+                                    date: null,
+                                    _id: null,
+                                    file: {},
+                                })
+                            }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
                         </div>
                     </div>
                 )}
@@ -387,7 +401,7 @@ const DetailsCalander = (props) => {
                 onHide={() => { if (!showEdit) return; setShowEdit(false); }}
                 content={({ hide }) => (
                     <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
-            <h2 style={{textAlign:'center'}}>Add the task</h2>
+                        <h2 style={{ textAlign: 'center' }}>Add the task</h2>
 
                         <div className="inline-flex flex-column gap-2">
                             <InputText value={selectedTask.title} onChange={(e) => setSelectedTask({ ...selectedTask, title: e.target.value })} className="input-focus" placeholder="Task Name" label="TaskName" type="text" required></InputText>
@@ -438,12 +452,15 @@ const DetailsCalander = (props) => {
                                         file: newfile
                                     });
                                 }}
-                               
+
                             />
                         </div>
                         <div className="flex align-items-center gap-2">
-                            <Button label="Update" onClick={(e) => { hide(e); editTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
-                            <Button label="Cancel" onClick={(e) => hide(e)} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
+{ selectedTask.title ?                        
+   <Button label="Update" onClick={(e) => { hide(e); editTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+:   <Button disabled label="Update" onClick={(e) => { hide(e); editTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+
+}                            <Button label="Cancel" onClick={(e) => hide(e)} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
                         </div>
                     </div>
                 )}

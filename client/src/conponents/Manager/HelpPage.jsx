@@ -1,12 +1,20 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Toast } from 'primereact/toast';
+import { useRef } from "react";
+import { ProgressSpinner } from "primereact/progressspinner";
 
 const Help=()=> {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-  const onSubmit = async () => {
+  const toast = useRef(null);
+  const [loading, setLoading] = useState(false);
+
+  const onSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
         try {
       const res=await axios.post('http://localhost:2000/api/email/send-email', {
         name,
@@ -14,10 +22,16 @@ const Help=()=> {
         message
       });
       if (res.status === 200){
-              alert('Message sent!');
+              toast.current.show({ severity: 'success', summary: 'Success', detail: 'Message sent successfully!', life: 3000 });
+              setName('');
+              setEmail('');
+              setMessage('');
       } 
     } catch (err) {
-      alert('Failed to send: ' + err.response?.data?.error || err.message);
+      // alert('Failed to send: ' + err.response?.data?.error || err.message);
+      toast.current.show({ severity: 'error', summary: 'Error', detail: err.response?.data?.error || err.message, life: 3000 });
+    }finally {
+      setLoading(false);
     }
   };
   return (
@@ -32,6 +46,7 @@ const Help=()=> {
         boxShadow: '0 0 10px rgba(0, 128, 128, 0.1)',
       }}
     >
+      <Toast ref={toast} />
       <section style={{ 
         marginBottom: '40px', textAlign: 'left' }}>
         <h1
@@ -129,21 +144,33 @@ const Help=()=> {
             fontWeight: '600',
             color: '#004f4f',
             marginBottom: '15px',
+            display: 'flex',
+    alignItems: 'center',
+    gap: '10px'
           }}
         >
           Leave a Message
+          {loading && (
+  <div style={{ margin: "20px" }}>
+    <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="5" />
+  </div>
+)}
         </h2>
-        <form style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <input type="text" placeholder="Your Name" style={inputStyle} value={name} onChange={e => setName(e.target.value)}/>
-          <input type="email" placeholder="Your Email" style={inputStyle} value={email} onChange={e => setEmail(e.target.value)}/>
+        <form onSubmit={onSubmit}  style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <input required type="text" placeholder="Your Name" style={inputStyle} value={name} onChange={e => setName(e.target.value)}/>
+          <input required type="email" placeholder="Your Email" style={inputStyle} value={email} onChange={e => setEmail(e.target.value)}/>
           <textarea
             value={message} onChange={e => setMessage(e.target.value)}
             placeholder="Write your message here..."
             style={{ ...inputStyle, minHeight: '120px' }}
           ></textarea>
-          <button type="submit" style={buttonStyle} value={"Send Message"} onClick={onSubmit}>
-            Send Message
-          </button> 
+          <input required type="submit" style={{padding: '12px',
+                                       backgroundColor: '#009688',
+                                       color: 'white',
+                                       border: 'none',
+                                       borderRadius: '6px',
+                                       fontSize: '16px',
+                                       cursor: 'pointer',}} value={"Send Message"} />
         
         </form>
       </section>
@@ -159,15 +186,7 @@ const inputStyle = {
   backgroundColor: '#ffffff',
 };
 
-const buttonStyle = {
-  padding: '12px',
-  backgroundColor: '#009688',
-  color: 'white',
-  border: 'none',
-  borderRadius: '6px',
-  fontSize: '16px',
-  cursor: 'pointer',
-};
+
 
 function Section({ title, children }) {
   return (

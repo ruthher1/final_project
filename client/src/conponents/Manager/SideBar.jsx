@@ -16,6 +16,10 @@ import { ConfirmPopup } from 'primereact/confirmpopup';
 import { confirmPopup } from 'primereact/confirmpopup'; 
 import { useSelector } from "react-redux";
 
+import { Toast } from 'primereact/toast';
+import { useRef } from "react";
+import { InputTextarea } from "primereact/inputtextarea";
+
 export default function Aaa(props) {
 
   const [isProjectsOpen, setIsProjectsOpen] = useState(false);
@@ -24,7 +28,7 @@ export default function Aaa(props) {
   const [visible, setVisible] = useState(false);
   const [show, setShow] = useState(false);
   const id=useSelector(x=>x.Id.id)
-  
+  const toast = useRef(null);
   const [showAddTaskToAllClients, setShowAddTaskToAllClients] = useState(false);
   const [taskToAllClients, setTaskToAllClients] = useState({
     managerid: id,
@@ -124,7 +128,7 @@ export default function Aaa(props) {
             { headers: { Authorization: `Bearer ${token}` } })
           if (res.status === 200) {
             if (index === contacts.length - 1) {
-              alert("task added to all clients")
+              toast.current.show({ severity: 'success', summary: 'Success', detail: 'Task added to all clients in the group', life: 3000});
               setTaskToAllClients({
                 managerid: id,
                 projectid: "",
@@ -237,6 +241,7 @@ export default function Aaa(props) {
   return (
     <>
       <div className="app-container">
+        <Toast ref={toast} />
         {!isMobile && (
           <div className="sidebar">
             <h2>Menu</h2>
@@ -268,8 +273,11 @@ export default function Aaa(props) {
               <InputText onChange={(e) => setProjectname(e.target.value)} className="input-focus" placeholder="Project Name" id="projectname" label="Projectname" type="text"></InputText>
             </div>
             <div className="flex align-items-center gap-2">
-              <Button label="Add" onClick={(e) => { hide(e); addProject() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
-              <Button label="Cancel" onClick={(e) => hide(e)} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
+{    projectname?        
+  <Button label="Add" onClick={(e) => { hide(e); addProject() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+:  <Button disabled label="Add" onClick={(e) => { hide(e); addProject() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+}       
+       <Button label="Cancel" onClick={(e) => hide(e)} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
             </div>
           </div>
         )}
@@ -287,7 +295,7 @@ export default function Aaa(props) {
               <InputText onChange={(e) => setTaskToAllClients({ ...taskToAllClients, title: e.target.value })} className="input-focus" placeholder="Task Title" id="title" label="Task Title" type="text"></InputText>
             </div>
             <div className="inline-flex flex-column gap-2">
-              <InputText onChange={(e) => setTaskToAllClients({ ...taskToAllClients, description: e.target.value })} className="input-focus" placeholder="Description" id="description" label="Description" type="text"></InputText>
+              <InputTextarea onChange={(e) => setTaskToAllClients({ ...taskToAllClients, description: e.target.value })} className="input-focus" placeholder="Description" id="description" label="Description" type="text"></InputTextarea>
             </div>
             <div className="inline-flex flex-column gap-2">
               <Calendar value={taskToAllClients.date} onChange={(e) => setTaskToAllClients({ ...taskToAllClients, date: e.target.value })} placeholder="Date" />
@@ -304,8 +312,23 @@ export default function Aaa(props) {
             </div>
 
             <div className="flex align-items-center gap-2">
-              <Button label="Add" onClick={(e) => { hide(e); addTaskToAllClients() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
-              <Button label="Cancel" onClick={(e) => hide(e)} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
+ {(taskToAllClients.title && taskToAllClients.date) ?
+              <Button label="Add" onClick={(e) => {
+                hide(e); addTaskToAllClients()
+              }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>:
+              <Button disabled label="Add" onClick={(e) => {
+                hide(e); addTaskToAllClients()
+              }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>
+              }        
+   <Button label="Cancel" onClick={(e) => {hide(e); setTaskToAllClients({
+                managerid: id,
+                projectid: "",
+                clientid: "",
+                title: "",
+                description: "",
+                date: "",
+                file: {}
+              })}} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
             </div>
           </div>
         )}
