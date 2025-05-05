@@ -1,12 +1,15 @@
 import axios from "axios"   
-import React, { useState ,useEffect} from "react";
+import React, { useState ,useEffect, useRef} from "react";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Avatar } from "primereact/avatar";
 import { Dropdown } from 'primereact/dropdown';
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-export default function AddForm(props) {
+import { useForm } from "react-hook-form";
+
+
+const AddForm=(props)=> {
     const [selectedProject, setSelectedProject] = useState(null);
     const [projects, setProjects] = useState([]);
     const [contact, setContact] = useState({
@@ -34,6 +37,7 @@ export default function AddForm(props) {
     }
     catch (err) {
         console.error(err)
+
     }
 }
 
@@ -46,7 +50,7 @@ useEffect(() => {
     setContact({ ...contact, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async(e) => {
+  const onSubmit = async(e) => {
     e.preventDefault(); 
     const client = {
       ...contact,
@@ -68,24 +72,25 @@ useEffect(() => {
 
   return (
     <div className="form-container">
-      <form onSubmit={handleSubmit} className="form-content">
+      <form onSubmit={onSubmit} className="form-content">
       <div className="profile-section">
         <Avatar icon="pi pi-user" size="xlarge" shape="circle" className="profile-avatar" />
       </div>
 
         <div className="p-inputgroup">
           <span className="p-inputgroup-addon"><i className="pi pi-user" /></span>
-          <InputText name="name" placeholder="Full Name" value={contact.name} onChange={handleChange} required/>
+          <InputText required name="name" placeholder="Full Name" value={contact.name} onChange={handleChange} />
         </div>
 
         <div className="p-inputgroup">
           <span className="p-inputgroup-addon"><i className="pi pi-id-card" /></span>
-          <InputText name="userid" placeholder="ID" value={contact.userid} onChange={handleChange}required/>
+          <InputText required name="userid" placeholder="ID" value={contact.userid} onChange={handleChange} />
+
         </div>
 
         <div className="p-inputgroup">
           <span className="p-inputgroup-addon"><i className="pi pi-phone" /></span>
-          <InputText name="phone" placeholder="Phone"value={contact.phone} onChange={handleChange}/>
+          <InputText required name="phone" placeholder="Phone"value={contact.phone} onChange={handleChange}/>
         </div>
 
         <div className="p-inputgroup">
@@ -95,20 +100,20 @@ useEffect(() => {
 
         <div className="p-inputgroup">
           <span className="p-inputgroup-addon"><i className="pi pi-envelope" /></span>
-          <InputText
-            name="email" placeholder="Email" value={contact.email} onChange={handleChange} required/>
+          <InputText required type="email"
+            name="email" placeholder="Email" value={contact.email} onChange={handleChange} />
         </div>
 
         <div className="p-inputgroup">
           <span className="p-inputgroup-addon"><i className="pi pi-briefcase" /></span>
           <Dropdown 
+          required
           style={{ textAlign: 'left' }}
           value={selectedProject} 
           onChange={(e) => {setSelectedProject(e.value)}} 
           options={projects} 
           optionLabel="name"
           placeholder="Project" 
-          required
           className="w-full md:w-14rem" />
         </div>
 
@@ -118,3 +123,31 @@ useEffect(() => {
     </div>
   );
 }
+export default AddForm;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

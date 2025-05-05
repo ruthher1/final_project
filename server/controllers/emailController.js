@@ -3,6 +3,9 @@ require('dotenv').config();
 
 const sendEmail = async (req, res) => {
   const { name, email, message } = req.body;
+  if (!name || !email || !message) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
   const transporter = nodemailer.createTransport({
     host: 'smtp.office365.com',
     port: 587,
