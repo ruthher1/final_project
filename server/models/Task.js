@@ -16,7 +16,6 @@ const taskSchema = new mongoose.Schema({
     completed: {
         type: Boolean,
         default: false,
-        maxlength: 100,
     },
     connectionid: {
         type: mongoose.Schema.Types.ObjectId,

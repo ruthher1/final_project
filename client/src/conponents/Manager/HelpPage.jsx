@@ -1,7 +1,25 @@
 
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-const Help=(props)=> {
+const Help=()=> {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const onSubmit = async () => {
+        try {
+      const res=await axios.post('http://localhost:2000/api/email/send-email', {
+        name,
+        email,
+        message
+      });
+      if (res.status === 200){
+              alert('Message sent!');
+      } 
+    } catch (err) {
+      alert('Failed to send: ' + err.response?.data?.error || err.message);
+    }
+  };
   return (
     <div
       style={{
@@ -35,10 +53,6 @@ const Help=(props)=> {
 
       <Section title="Key Features">
         <ul>
-          <li>
-            <strong>Dashboard:</strong> Quick overview of updates, tasks, and
-            client progress.
-          </li>
           <li>
             <strong>Client Management:</strong> Manage, edit, and track all
             client profiles and progress.
@@ -120,15 +134,17 @@ const Help=(props)=> {
           Leave a Message
         </h2>
         <form style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <input type="text" placeholder="Your Name" style={inputStyle} />
-          <input type="email" placeholder="Your Email" style={inputStyle} />
+          <input type="text" placeholder="Your Name" style={inputStyle} value={name} onChange={e => setName(e.target.value)}/>
+          <input type="email" placeholder="Your Email" style={inputStyle} value={email} onChange={e => setEmail(e.target.value)}/>
           <textarea
+            value={message} onChange={e => setMessage(e.target.value)}
             placeholder="Write your message here..."
             style={{ ...inputStyle, minHeight: '120px' }}
           ></textarea>
-          <button type="submit" style={buttonStyle}>
+          <button type="submit" style={buttonStyle} value={"Send Message"} onClick={onSubmit}>
             Send Message
-          </button>
+          </button> 
+        
         </form>
       </section>
     </div>

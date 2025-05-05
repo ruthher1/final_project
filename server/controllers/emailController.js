@@ -3,7 +3,6 @@ require('dotenv').config();
 
 const sendEmail = async (req, res) => {
   const { name, email, message } = req.body;
-
   const transporter = nodemailer.createTransport({
     host: 'smtp.office365.com',
     port: 587,

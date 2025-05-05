@@ -52,7 +52,11 @@ const changePassword=async()=>{
     };
 
     return (
-        <div className="max-w-2xl mx-auto py-10 card">
+        <div className="max-w-2xl mx-auto py-10 card"  style={{
+            margin: '5% ',
+            marginTop: '5%',
+            padding: '30px',
+          }}>
             <Card className="text-center">
                 <Avatar image={manager.imageURL} size="xlarge" shape="circle" className="mx-auto mb-4" icon="pi pi-user"  style={{ transform: 'scale(1.5)' }}/>
                 <h2 className="text-xl font-semibold mb-2">Profile Settings</h2>

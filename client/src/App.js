@@ -5,8 +5,6 @@ import SignUp from './conponents/SignUp';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Site from './conponents/Manager/Site';
 import SiteClient from './conponents/Client/SiteClient';
-import Settings from './conponents/Client/Settings';
-import Help from './conponents/Manager/HelpPage';
 
 
 function App() {
@@ -22,7 +20,7 @@ function App() {
          <Route path="/manager/:id/settings" element={<Site />} />
          <Route path="/manager/:id/help" element={<Site />} />
          <Route path="/client/:id" element={<SiteClient/>} />
-         <Route path="/client/:id/settings" element={<Settings />} />
+         <Route path="/manager/:id/analytics" element={<Site />} />
 
 
        </Routes>

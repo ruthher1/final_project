@@ -14,7 +14,7 @@ router.put("/updateTask",userJWT,managerMiddleware, upload.single('file'),taskCo
 router.put("/completeTask",userJWT,clientMiddleware,taskController.completeTask)
 router.delete("/deleteTask/:id",userJWT,managerMiddleware, upload.single('file'),taskController.deleteTask)
 router.get("/getTasks/:clientid",userJWT,clientMiddleware,taskController.getTasks)
-
+router.get("/getAllManagerTasks/:managerid",userJWT,managerMiddleware,taskController.getAllManagerTasks)
 
 
 module.exports=router

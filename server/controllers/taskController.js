@@ -91,8 +91,28 @@ const getTasks = async (req, res) => {
     }
     const connectionIds = connections.map(c => c._id);
     const allTasks = await Task.find({ connectionid: { $in: connectionIds } }).populate({  path: "connectionid",  populate: [ { path: "managerid" }, { path: "projectid" }]})  .populate("file").lean();
+    if (!allTasks) {
+        return res.status(400).send("tasks not found")
+    }
     res.json(allTasks);
 };
+const getAllManagerTasks = async (req, res) => {
+    const { managerid } = req.params;
+    if (!managerid) {
+        return res.status(400).send("managerid is required");
+    }
+    const connections = await Connection.find({ managerid }).lean();
+    if (!connections.length) {
+        return res.status(400).send("Connections not found");
+    }
+    const connectionIds = connections.map(c => c._id);
+    const allTasks = await Task.find({ connectionid: { $in: connectionIds } }).lean();
+    if (!allTasks) {
+        return res.status(400).send("tasks not found")
+    }
+    res.json(allTasks);
+};
+
 
 
 const updateTask = async (req, res) => {
@@ -221,4 +241,4 @@ const deleteTask = async (req, res) => {
     res.json(tasks)
 }
 
-module.exports = { getTasks, addTask, getTask, updateTask, deleteTask, completeTask, getTasksClient }
+module.exports = { getTasks, addTask, getTask, updateTask, deleteTask, completeTask, getTasksClient ,getAllManagerTasks}

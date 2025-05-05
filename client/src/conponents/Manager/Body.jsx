@@ -79,7 +79,7 @@ export default function Body(props) {
             <>
                 <ConfirmPopup/>
                 <Button icon="pi pi-trash" className="p-button-text" onClick={(e)=>{confirm(e)}} />
-                <Button icon="pi pi-pencil" className="p-button-text" onClick={handleEdit} />
+                {/* <Button icon="pi pi-pencil" className="p-button-text" onClick={handleEdit} /> */}
                 <Button label="Details" icon="pi pi-eye" className="p-button-text" onClick={handleDetails} />
             </>
         );
