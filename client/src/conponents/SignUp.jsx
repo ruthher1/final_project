@@ -13,14 +13,12 @@ const SignUp = () => {
 
     const onSubmit = async (data) => {
         try {
-            console.log(data)
             const res = await axios.post('http://localhost:2000/api/users/addManager', data)
             if (res.status === 200) {
                 navigate(`../`)
             }
         } catch (e) {
             console.error(e)
-           
                 toast.current.show({ severity: 'error', summary: 'Error', detail: e.response.data, life: 3000 });
            
         }

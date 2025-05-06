@@ -5,10 +5,8 @@ const cors = require("cors");
 const corsOptions = require("./config/corsOptions");
 const mongoose = require("mongoose");
 const connectDB = require("./config/dbConn");
-
 const http = require('http');
 const socketIo = require('socket.io');
-
 const PORT = process.env.PORT || 2004;
 const app = express();
 connectDB();
@@ -34,7 +32,6 @@ app.use("/api/users", require("./routes/user"));
 app.use("/api/tasks", require("./routes/task"));
 app.use("/api/login", require("./routes/login"));
 app.use("/api/projects", require("./routes/project"));
-//email
 app.use('/api/email', require("./routes/emailRoutes"));
 
 mongoose.connection.once("open", () => {

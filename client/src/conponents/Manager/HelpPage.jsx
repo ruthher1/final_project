@@ -34,6 +34,7 @@ const Help=()=> {
       setLoading(false);
     }
   };
+  
   return (
     <div
       style={{

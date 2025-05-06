@@ -17,8 +17,8 @@ const TaskPage = (props) => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const token = JSON.parse(localStorage.getItem('token')) || ""
     // const id = props.id || {}
-    const id=useSelector(x=>x.Id.id)
-    
+    const id = useSelector(x => x.Id.id)
+
     const managers = props.managers || {}
     const tasks = props.tasks || {}
     const setTasks = props.setTasks || {}
@@ -80,11 +80,10 @@ const TaskPage = (props) => {
 
     const updateTask = async (task = taskCompleted) => {
         try {
-            console.log(taskCompleted._id)
             const res = await axios.put(`http://localhost:2000/api/tasks/completeTask`, { ...task, id: task._id, clientid: id },
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                setTasks(res.data.map((newtask) => { return { ...newtask, managername: newtask.connectionid.managerid.name,projectname:newtask.connectionid.projectid.name } }));
+                setTasks(res.data.map((newtask) => { return { ...newtask, managername: newtask.connectionid.managerid.name, projectname: newtask.connectionid.projectid.name } }));
                 setTaskCompleted({})
             }
         }
@@ -150,8 +149,11 @@ const TaskPage = (props) => {
                                         <i className="pi pi-file" style={{ fontSize: '2rem', color: '#6c757d' }}></i>
                                         <div className="flex-1">
                                             <h4 className="m-0">{rowData.file?.fileName}</h4>
-                                            <a href={rowData.file?.filePath} download>
+                                            {/* <a href={rowData.file?.filePath} download>
                                                 <Button icon="pi pi-download" className="p-button-sm p-button-text"  />
+                                            </a> */}
+                                            <a href={`http://localhost:2000/${rowData.file?.filePath}`} download={rowData.file?.fileName}>
+                                                <Button icon="pi pi-download" className="p-button-sm p-button-text" />
                                             </a>
                                             <Button
                                                 icon="pi pi-external-link"
@@ -175,6 +177,7 @@ const TaskPage = (props) => {
                                                     }
                                                 }}
                                             />
+                                           
                                         </div>
                                     </div>
                                 ) : (<>No File</>)}
@@ -274,7 +277,7 @@ const TaskPage = (props) => {
                                 borderRadius: "5px",
                                 cursor: "pointer"
                             }}>
-                                 {`${manager.managerid.name}-${manager.projectid.name}`}
+                                {`${manager.managerid.name}-${manager.projectid.name}`}
 
                             </div>
                         </div>
@@ -293,7 +296,7 @@ const TaskPage = (props) => {
                 onHide={() => { if (!showCompleted) return; setShowCompleted(false); }}
                 content={({ hide }) => (
                     <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
-                     <h2 style={{textAlign:'center'}}>Do you want to respond?</h2>
+                        <h2 style={{ textAlign: 'center' }}>Do you want to respond?</h2>
 
                         <div className="inline-flex flex-column gap-2">
                             <Dropdown
@@ -308,10 +311,10 @@ const TaskPage = (props) => {
                             <InputTextarea placeholder="write your comment hear...." value={taskCompleted.comment} disabled={!isToday} onChange={(e) => setTaskCompleted({ ...taskCompleted, comment: e.target.value })} />
                         </div>
                         <div className="flex align-items-center gap-2">
-{  taskCompleted.comment||taskCompleted.dictionary?
-<Button label="Send" onClick={(e) => { hide(e); updateTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
-:<Button disabled label="Send" onClick={(e) => { hide(e); updateTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
-}                        
+                            {taskCompleted.comment || taskCompleted.difficulty ?
+                                <Button label="Send" onClick={(e) => { hide(e); updateTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+                                : <Button disabled label="Send" onClick={(e) => { hide(e); updateTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+                            }
                             <Button label="No" onClick={(e) => { hide(e); setTaskCompleted({}); updateTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
                         </div>
                     </div>

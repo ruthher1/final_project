@@ -40,7 +40,6 @@ export default function Aaa(props) {
   const navigate = useNavigate()
   const setContacts = props.setContacts || {}
   const contacts = props.contacts || {}
-  console.log(contacts)
   const [coppyContacts, setCoppyContacts] = useState([]);
   useEffect(() => {
     if (coppyContacts.length === 0) {
@@ -59,7 +58,6 @@ export default function Aaa(props) {
 
   const getProjects = async () => {
     try {
-      console.log(id)
       const res = await axios.get(`http://localhost:2000/api/projects/getProjects/${id}`,
         { headers: { Authorization: `Bearer ${token}` } })
       if (res.status === 200) {

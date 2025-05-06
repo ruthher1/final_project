@@ -11,10 +11,8 @@ const addTask = async (req, res) => {
     if (!title || !managerid || !clientid || !projectid || !date) {
         return res.status(400).send("title clientid managerid projectid date are required")
     }
-    // console.log(req.file)
     let fileExists=null
     let fileData=null
-    // console.log(file);
     if (file) {
         fileData = {
             fileName: file.originalname,
