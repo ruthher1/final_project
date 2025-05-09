@@ -17,7 +17,9 @@ const TaskPage = (props) => {
     const client = props.client || {}
     const [selectedDate, setSelectedDate] = useState(new Date());
     const token = JSON.parse(localStorage.getItem('token')) || ""
+    // const id = props.id || {}
     const id = useSelector(x => x.Id.id)
+
     const managers = props.managers || {}
     const tasks = props.tasks || {}
     const setTasks = props.setTasks || {}
@@ -143,11 +145,12 @@ const TaskPage = (props) => {
                                         <i className="pi pi-file" style={{ fontSize: '2rem', color: '#6c757d' }}></i>
                                         <div className="flex-1">
                                             <h4 className="m-0">{rowData.file?.fileName}</h4>
-                                            <Button
-                                                icon="pi pi-download"
-                                                text
-                                                onClick={() => { window.open(`http://localhost:2000/api/files/download/${rowData.file?.fileName}`, '_blank') }}
-                                            />
+                                            {/* <a href={rowData.file?.filePath} download>
+                                                <Button icon="pi pi-download" className="p-button-sm p-button-text"  />
+                                            </a> */}
+                                            <a href={`http://localhost:2000/${rowData.file?.filePath}`} download={rowData.file?.fileName}>
+                                                <Button icon="pi pi-download" className="p-button-sm p-button-text" />
+                                            </a>
                                             <Button
                                                 icon="pi pi-external-link"
                                                 text

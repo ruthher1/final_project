@@ -6,23 +6,23 @@ const Connection = require("../models/Connection")
 // const addTask = async (req, res) => {
 //     console.log("addTask");
     
-//     const { title, description, managerid, clientid, projectid, date } = req.body
-//     const file=req.file
-//     if (!title || !managerid || !clientid || !projectid || !date) {
-//         return res.status(400).send("title clientid managerid projectid date are required")
-//     }
-//     let fileExists=null
-//     let fileData=null
-//     if (file) {
-//         fileData = {
-//             fileName: file.originalname,
-//             filePath: file.path,
-//             fileSize: file.size,
-//             fileType: file.mimetype
-//         };
-//         if (!file.originalname || !file.path || !file.size || !file.mimetype) {
-//             return res.status(400).send("name type size path are required")
-//         }
+    // const { title, description, managerid, clientid, projectid, date } = req.body
+    // const file=req.file
+    // if (!title || !managerid || !clientid || !projectid || !date) {
+    //     return res.status(400).send("title clientid managerid projectid date are required")
+    // }
+    // let fileExists=null
+    // let fileData=null
+    // if (file) {
+    //     fileData = {
+    //         fileName: file.originalname,
+    //         filePath: file.path,
+    //         fileSize: file.size,
+    //         fileType: file.mimetype
+    //     };
+    //     if (!file.originalname || !file.path || !file.size || !file.mimetype) {
+    //         return res.status(400).send("name type size path are required")
+    //     }
         
 //         fileExists = await File.findOne(fileData).lean()
 //         if (!fileExists) {
