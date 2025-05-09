@@ -12,8 +12,8 @@ import { Calendar } from 'primereact/calendar';
 import { FileUpload } from "primereact/fileupload";
 import { Tooltip } from 'primereact/tooltip';
 
-import { ConfirmPopup } from 'primereact/confirmpopup'; 
-import { confirmPopup } from 'primereact/confirmpopup'; 
+import { ConfirmPopup } from 'primereact/confirmpopup';
+import { confirmPopup } from 'primereact/confirmpopup';
 import { useSelector } from "react-redux";
 
 import { Toast } from 'primereact/toast';
@@ -27,20 +27,16 @@ export default function Aaa(props) {
   const [isMobile, setIsMobile] = useState(false);
   const [visible, setVisible] = useState(false);
   const [show, setShow] = useState(false);
-  const id=useSelector(x=>x.Id.id)
+  const id = useSelector(x => x.Id.id)
   const toast = useRef(null);
   const [showAddTaskToAllClients, setShowAddTaskToAllClients] = useState(false);
-  const [taskToAllClients, setTaskToAllClients] = useState({
-    managerid: id,
-  });
-
+  const [taskToAllClients, setTaskToAllClients] = useState({ managerid: id });
   const [projectname, setProjectname] = useState("")
   const location = useLocation();
   const token = JSON.parse(localStorage.getItem('token')) || ""
   const navigate = useNavigate()
   const setContacts = props.setContacts || {}
   const contacts = props.contacts || {}
-  console.log(contacts)
   const [coppyContacts, setCoppyContacts] = useState([]);
   useEffect(() => {
     if (coppyContacts.length === 0) {
@@ -54,12 +50,10 @@ export default function Aaa(props) {
     setContacts(coppyContacts.filter((contact) => {
       return contact.projectid === projectid
     }))
-
   }
 
   const getProjects = async () => {
     try {
-      console.log(id)
       const res = await axios.get(`http://localhost:2000/api/projects/getProjects/${id}`,
         { headers: { Authorization: `Bearer ${token}` } })
       if (res.status === 200) {
@@ -75,7 +69,6 @@ export default function Aaa(props) {
   }
 
   const deleteProject = async (projectid) => {
-
     try {
       const res = await axios.delete(`http://localhost:2000/api/projects/deleteProject`,
         { data: { projectid, managerid: id }, headers: { Authorization: `Bearer ${token}` } })
@@ -91,6 +84,7 @@ export default function Aaa(props) {
       console.error(err)
     }
   }
+
   const addProject = async () => {
     try {
       const res = await axios.post("http://localhost:2000/api/projects/addProject", { name: projectname, managerid: id },
@@ -108,11 +102,12 @@ export default function Aaa(props) {
     }
 
   }
+
   const addTaskToAllClients = () => {
     const formData = new FormData();
     formData.append("title", taskToAllClients.title);
-    if(taskToAllClients.description) {
-    formData.append("description", taskToAllClients.description);
+    if (taskToAllClients.description) {
+      formData.append("description", taskToAllClients.description);
     }
     formData.append("date", taskToAllClients.date);
     formData.append("managerid", taskToAllClients.managerid);
@@ -121,14 +116,14 @@ export default function Aaa(props) {
     try {
       contacts.map(async (contact, index) => {
         if (contact.projectid === taskToAllClients.projectid) {
-          
+
           formData.delete("clientid")
           formData.append("clientid", contact._id);
-          const res = await axios.post(`http://localhost:2000/api/tasks/addTask`, formData,
+          const res = await axios.post(`http://localhost:2000/api/files/addTask`, formData,
             { headers: { Authorization: `Bearer ${token}` } })
           if (res.status === 200) {
             if (index === contacts.length - 1) {
-              toast.current.show({ severity: 'success', summary: 'Success', detail: 'Task added to all clients in the group', life: 3000});
+              toast.current.show({ severity: 'success', summary: 'Success', detail: 'Task added to all clients in the group', life: 3000 });
               setTaskToAllClients({
                 managerid: id,
                 projectid: "",
@@ -147,8 +142,8 @@ export default function Aaa(props) {
     } catch (error) {
       console.error(error)
     }
-
   }
+
   const toggleProjects = () => {
     setIsProjectsOpen(!isProjectsOpen);
   };
@@ -183,8 +178,8 @@ export default function Aaa(props) {
       label: "Users",
       icon: "pi pi-users",
       items: [
-        { label: "All Clients", icon: "pi pi-list", command: () => num == 1 ? navigate(0, { state: {  num: 1 } }) : navigate(`/manager/${id}`, { state: {  num: 1 } }) },
-        { label: "Add Client", icon: "pi pi-user-plus", command: () => navigate(`/manager/${id}/addUser`, { state: {  num: 2 } }) }
+        { label: "All Clients", icon: "pi pi-list", command: () => num == 1 ? navigate(0, { state: { num: 1 } }) : navigate(`/manager/${id}`, { state: { num: 1 } }) },
+        { label: "Add Client", icon: "pi pi-user-plus", command: () => navigate(`/manager/${id}/addUser`, { state: { num: 2 } }) }
       ]
     },
     {
@@ -198,14 +193,14 @@ export default function Aaa(props) {
         ...(isProjectsOpen ? projects.map(project => ({
           template: (item, options) => (
             <div className="highlight-div"
-            onClick={() => { showProjectContacts(project._id) }} style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              width: '90%',
-              padding: '0.5rem 1rem',
-              cursor: 'pointer'
-            }}>
+              onClick={() => { showProjectContacts(project._id) }} style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '90%',
+                padding: '0.5rem 1rem',
+                cursor: 'pointer'
+              }}>
               <span >{`-${project.name}`}</span>
               <ConfirmPopup />
 
@@ -221,7 +216,7 @@ export default function Aaa(props) {
                 style={{ cursor: 'pointer', marginLeft: '5px' }}
                 onClick={() => { setShowAddTaskToAllClients(true); setTaskToAllClients({ ...taskToAllClients, projectid: project._id }) }}
               />
-             
+
 
 
 
@@ -232,9 +227,9 @@ export default function Aaa(props) {
       ]
 
     },
-    { label: "Analytics", icon: "pi pi-chart-bar", command: () => navigate(`/manager/${id}/analytics`, { state: {  num: 7} }) },
-    { label: "Settings", icon: "pi pi-cog", command: () => navigate(`/manager/${id}/settings`, { state: {  num: 4 } }) },
-    { label: "Help", icon: "pi pi-question", command: () => navigate(`/manager/${id}/help`, { state: {  num: 6} }) },
+    { label: "Analytics", icon: "pi pi-chart-bar", command: () => navigate(`/manager/${id}/analytics`, { state: { num: 7 } }) },
+    { label: "Settings", icon: "pi pi-cog", command: () => navigate(`/manager/${id}/settings`, { state: { num: 4 } }) },
+    { label: "Help", icon: "pi pi-question", command: () => navigate(`/manager/${id}/help`, { state: { num: 6 } }) },
 
   ];
 
@@ -261,23 +256,24 @@ export default function Aaa(props) {
           <h2>Menu</h2>
           <Menu model={items} className="w-full" />
         </Sidebar>
+
       </div>
-      <Dialog   
+      <Dialog
         visible={show}
         modal
         onHide={() => { if (!show) return; setShow(false); }}
         content={({ hide }) => (
           <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
-            <h2 style={{textAlign:'center'}}>Add a new project</h2>
+            <h2 style={{ textAlign: 'center' }}>Add a new project</h2>
             <div className="inline-flex flex-column gap-2">
               <InputText onChange={(e) => setProjectname(e.target.value)} className="input-focus" placeholder="Project Name" id="projectname" label="Projectname" type="text"></InputText>
             </div>
             <div className="flex align-items-center gap-2">
-{    projectname?        
-  <Button label="Add" onClick={(e) => { hide(e); addProject() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
-:  <Button disabled label="Add" onClick={(e) => { hide(e); addProject() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
-}       
-       <Button label="Cancel" onClick={(e) => hide(e)} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
+              {projectname ?
+                <Button label="Add" onClick={(e) => { hide(e); addProject() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+                : <Button disabled label="Add" onClick={(e) => { hide(e); addProject() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+              }
+              <Button label="Cancel" onClick={(e) => hide(e)} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
             </div>
           </div>
         )}
@@ -289,7 +285,7 @@ export default function Aaa(props) {
         onHide={() => { if (!showAddTaskToAllClients) return; setShowAddTaskToAllClients(false); }}
         content={({ hide }) => (
           <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
-          <h2 style={{textAlign:'center'}}>Add a task to the whole group</h2>
+            <h2 style={{ textAlign: 'center' }}>Add a task to the whole group</h2>
 
             <div className="inline-flex flex-column gap-2">
               <InputText onChange={(e) => setTaskToAllClients({ ...taskToAllClients, title: e.target.value })} className="input-focus" placeholder="Task Title" id="title" label="Task Title" type="text"></InputText>
@@ -298,7 +294,7 @@ export default function Aaa(props) {
               <InputTextarea onChange={(e) => setTaskToAllClients({ ...taskToAllClients, description: e.target.value })} className="input-focus" placeholder="Description" id="description" label="Description" type="text"></InputTextarea>
             </div>
             <div className="inline-flex flex-column gap-2">
-              <Calendar value={taskToAllClients.date} onChange={(e) => setTaskToAllClients({ ...taskToAllClients, date: e.target.value })} placeholder="Date" />
+              <Calendar value={taskToAllClients.date} onChange={(e) => setTaskToAllClients({ ...taskToAllClients, date: e.target.value })} placeholder="Date" minDate={new Date()} />
             </div>
             <div className="inline-flex flex-column gap-2 justify-content-center">
               <FileUpload chooseLabel="Upload Files"
@@ -306,37 +302,35 @@ export default function Aaa(props) {
                 mode="basic" name="demo[]" url="/api/upload" maxFileSize={1000000}
                 onSelect={(e) => {
                   const newfile = e.files[0];
-                  setTaskToAllClients({ ...taskToAllClients, file: newfile})
-              }}
+                  setTaskToAllClients({ ...taskToAllClients, file: newfile })
+                }}
               />
             </div>
 
             <div className="flex align-items-center gap-2">
- {(taskToAllClients.title && taskToAllClients.date) ?
-              <Button label="Add" onClick={(e) => {
-                hide(e); addTaskToAllClients()
-              }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>:
-              <Button disabled label="Add" onClick={(e) => {
-                hide(e); addTaskToAllClients()
-              }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>
-              }        
-   <Button label="Cancel" onClick={(e) => {hide(e); setTaskToAllClients({
-                managerid: id,
-                projectid: "",
-                clientid: "",
-                title: "",
-                description: "",
-                date: "",
-                file: {}
-              })}} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
+              {(taskToAllClients.title && taskToAllClients.date) ?
+                <Button label="Add" onClick={(e) => {
+                  hide(e); addTaskToAllClients()
+                }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button> :
+                <Button disabled label="Add" onClick={(e) => {
+                  hide(e); addTaskToAllClients()
+                }} className="w-full input-focus" style={{ color: "green", backgroundColor: "white", border: '1px solid green' }}></Button>
+              }
+              <Button label="Cancel" onClick={(e) => {
+                hide(e); setTaskToAllClients({
+                  managerid: id,
+                  projectid: "",
+                  clientid: "",
+                  title: "",
+                  description: "",
+                  date: "",
+                  file: {}
+                })
+              }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
             </div>
           </div>
         )}
       ></Dialog>
-
-
-
-
     </>
   );
 }

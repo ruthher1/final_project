@@ -12,15 +12,14 @@ const SignUp = () => {
     const { register, handleSubmit, watch, formState: { errors }, } = useForm()
 
     const onSubmit = async (data) => {
+        console.log(data)
         try {
-            console.log(data)
             const res = await axios.post('http://localhost:2000/api/users/addManager', data)
             if (res.status === 200) {
                 navigate(`../`)
             }
         } catch (e) {
             console.error(e)
-           
                 toast.current.show({ severity: 'error', summary: 'Error', detail: e.response.data, life: 3000 });
            
         }
@@ -32,7 +31,6 @@ const SignUp = () => {
             <Card title="Task Track" subTitle="SignUp" className="md:w-30rem custom-card p-card-subtitle"  >
 
                 <form onSubmit={handleSubmit(onSubmit)}>
-
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
 
                         <div className="flex flex-wrap justify-content-center align-items-center gap-2">

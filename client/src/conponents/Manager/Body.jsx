@@ -12,15 +12,13 @@ import { useSelector } from "react-redux";
 
 export default function Body(props) {
     const navigate = useNavigate()
-    const id=useSelector(x=>x.Id.id)
-    
+    const id = useSelector(x => x.Id.id)
     const contacts = props.contacts || {}
     const setContacts = props.setContacts || {}
     const token = JSON.parse(localStorage.getItem('token')) || ""
 
 
     const getContacts = async () => {
-
         try {
             const res = await axios.get(`http://localhost:2000/api/users/getManagerClients/${id}`,
                 { headers: { Authorization: `Bearer ${token}` } })
@@ -41,16 +39,18 @@ export default function Body(props) {
     }, [])
 
     const detailsClient = (rowData) => {
+
         const confirm = (event) => {
             confirmPopup({
-              target: event.currentTarget,
-              message: 'Do you want to delete this client?',
-              icon: 'pi pi-info-circle',
-              defaultFocus: 'reject',
-              accept:(()=>{handleDelete()}),
-              reject:()=>{}
+                target: event.currentTarget,
+                message: 'Do you want to delete this client?',
+                icon: 'pi pi-info-circle',
+                defaultFocus: 'reject',
+                accept: (() => { handleDelete() }),
+                reject: () => {}
             });
-          };
+        };
+
         const handleDelete = async () => {
             const client = { id: rowData._id, managerid: id, projectid: rowData.projectid }
             try {
@@ -60,7 +60,7 @@ export default function Body(props) {
                         headers: { Authorization: `Bearer ${token} ` }
                     })
                 if (res.status === 200) {
-                    const clients = res.data.map(client => { return { ...client.clientid, project: client.projectid.name,projectid: client.projectid._id } })
+                    const clients = res.data.map(client => { return { ...client.clientid, project: client.projectid.name, projectid: client.projectid._id } })
                     setContacts(clients)
                 }
             } catch (err) {
@@ -68,18 +68,14 @@ export default function Body(props) {
             }
         };
 
-        const handleEdit = () => {
-            navigate(`./editClient`, { state: { rowData ,num:3} })
+        const handleDetails = () => {
+            navigate(`./details/${rowData._id}`, { state: { rowData, num: 5 } })
         };
 
-        const handleDetails = () => {
-            navigate(`./details/${rowData._id}`, { state:{rowData,num:5} })
-        };
         return (
             <>
-                <ConfirmPopup/>
-                <Button icon="pi pi-trash" className="p-button-text" onClick={(e)=>{confirm(e)}} />
-                {/* <Button icon="pi pi-pencil" className="p-button-text" onClick={handleEdit} /> */}
+                <ConfirmPopup />
+                <Button icon="pi pi-trash" className="p-button-text" onClick={(e) => { confirm(e) }} />
                 <Button label="Details" icon="pi pi-eye" className="p-button-text" onClick={handleDetails} />
             </>
         );
@@ -88,20 +84,20 @@ export default function Body(props) {
     const avatarBodyTemplate = (rowData) => {
         return (
             <div style={{ display: "flex", alignItems: "center" }}>
-                
-                    <Avatar
-                        label={rowData.imageURL ?"":rowData.name ? rowData.name[0] : ""} 
-                        size="large"
-                        shape="circle"
-                        style={{
-                            backgroundImage: `url(${rowData.imageURL})`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                            marginRight: "10px",
-                        }}
-                        src={rowData.imageURL}
-                    />
-                
+
+                <Avatar
+                    label={rowData.imageURL ? "" : rowData.name ? rowData.name[0] : ""}
+                    size="large"
+                    shape="circle"
+                    style={{
+                        backgroundImage: `url(${rowData.imageURL})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        marginRight: "10px",
+                    }}
+                    src={rowData.imageURL}
+                />
+
                 <span>{rowData.name}</span>
             </div>
         );
@@ -111,7 +107,7 @@ export default function Body(props) {
         <div className="card">
             <h2>Clients</h2>
             <DataTable value={contacts} responsiveLayout="scroll">
-                <Column field="name" header="Name"  body={avatarBodyTemplate}/>
+                <Column field="name" header="Name" body={avatarBodyTemplate} />
                 <Column field="email" header="Email" />
                 <Column field="phone" header="Phone" />
                 <Column field="project" header="Project" />

@@ -16,7 +16,7 @@ const Login = () => {
     const [valueId, setValueId] = useState("")
     const [valuePass, setValuePass] = useState("")
     const navigate = useNavigate()
-    const id=useSelector(x=>x.Id.id)
+    // const id=useSelector(x=>x.Id.id)
     const dispatch=useDispatch()
     const toast = useRef(null);
 

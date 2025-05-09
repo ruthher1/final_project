@@ -1,0 +1,1 @@
+Scaffold-DbContext "Server=SRV2\PUPILS;Database=ShopAnimals;Trusted_Connection=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models

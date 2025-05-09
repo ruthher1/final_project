@@ -40,15 +40,15 @@ const DatailsTask = (props) => {
                                     {(task.file.fileSize / 1024).toFixed(1)} KB
                                 </p>
                             </div>
-                            <a href={task.file.filePath} download>
-                                <Button icon="pi pi-download" text tooltip="Fownload File" />
-                            </a>
+                            <Button
+                                icon="pi pi-download"
+                                text
+                                onClick={() => {window.open(`http://localhost:2000/api/files/download/${task.file.fileName}`, '_blank')}}
+                            />
                             <Button
                                 icon="pi pi-eye"
                                 text
-                                tooltip="Show File"
-                                onClick={() => window.open(`http://localhost:2000/${task.file.filePath}`, '_blank')}
-
+                                onClick={() => window.open(`http://localhost:2000/api/files/files/${task.file.fileName}`, '_blank')}
                             />
                         </div>
                     </>

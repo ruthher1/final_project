@@ -28,12 +28,12 @@ const Help=()=> {
               setMessage('');
       } 
     } catch (err) {
-      // alert('Failed to send: ' + err.response?.data?.error || err.message);
       toast.current.show({ severity: 'error', summary: 'Error', detail: err.response?.data?.error || err.message, life: 3000 });
     }finally {
       setLoading(false);
     }
   };
+  
   return (
     <div
       style={{

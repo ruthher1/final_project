@@ -48,6 +48,10 @@ const addClient = async (req, res) => {
     }
     let user = await User.findOne({ userid: userid, role: 'client' }).lean()
     if (user) {
+        const userExists = await Connection.findOne({ clientid: user._id,managerid,projectid }).lean()
+        if (userExists) {
+            return res.status(400).send("client exists")
+        }
         const client = await Connection.create({ managerid, projectid, clientid: user._id })
         if (!client) {
             return res.status(400).send("client not created")

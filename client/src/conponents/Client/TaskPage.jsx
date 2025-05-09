@@ -11,14 +11,13 @@ import { ScrollPanel } from 'primereact/scrollpanel';
 import { InputTextarea } from "primereact/inputtextarea";
 import { Dropdown } from "primereact/dropdown";
 import { useSelector } from "react-redux";
+import { Avatar } from "primereact/avatar";
 
 const TaskPage = (props) => {
     const client = props.client || {}
     const [selectedDate, setSelectedDate] = useState(new Date());
     const token = JSON.parse(localStorage.getItem('token')) || ""
-    // const id = props.id || {}
-    const id=useSelector(x=>x.Id.id)
-    
+    const id = useSelector(x => x.Id.id)
     const managers = props.managers || {}
     const tasks = props.tasks || {}
     const setTasks = props.setTasks || {}
@@ -62,6 +61,7 @@ const TaskPage = (props) => {
         if (newMessage.trim() !== '') {
             const message = {
                 sender: client.name,
+                senderURL: client.imageURL,
                 senderId: id,
                 receiverId: selectedManager.managerid._id,
                 content: newMessage,
@@ -71,20 +71,13 @@ const TaskPage = (props) => {
             setNewMessage('');
         }
     };
-    const printFile = () => {
-        const printWindow = window.open("URL_TO_YOUR_FILE", "_blank"); // פותח את הקובץ בלשונית חדשה
-        printWindow.onload = () => {
-            printWindow.print(); // מתחיל את פעולת ההדפסה
-        };
-    };
 
     const updateTask = async (task = taskCompleted) => {
         try {
-            console.log(taskCompleted._id)
             const res = await axios.put(`http://localhost:2000/api/tasks/completeTask`, { ...task, id: task._id, clientid: id },
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                setTasks(res.data.map((newtask) => { return { ...newtask, managername: newtask.connectionid.managerid.name,projectname:newtask.connectionid.projectid.name } }));
+                setTasks(res.data.map((newtask) => { return { ...newtask, managername: newtask.connectionid.managerid.name, projectname: newtask.connectionid.projectid.name } }));
                 setTaskCompleted({})
             }
         }
@@ -150,31 +143,17 @@ const TaskPage = (props) => {
                                         <i className="pi pi-file" style={{ fontSize: '2rem', color: '#6c757d' }}></i>
                                         <div className="flex-1">
                                             <h4 className="m-0">{rowData.file?.fileName}</h4>
-                                            <a href={rowData.file?.filePath} download>
-                                                <Button icon="pi pi-download" className="p-button-sm p-button-text"  />
-                                            </a>
+                                            <Button
+                                                icon="pi pi-download"
+                                                text
+                                                onClick={() => { window.open(`http://localhost:2000/api/files/download/${rowData.file?.fileName}`, '_blank') }}
+                                            />
                                             <Button
                                                 icon="pi pi-external-link"
-                                                className="p-button-sm p-button-text"
-                                                // onClick={() => window.open(rowData.file?.filePath, '_blank')}
-                                                onClick={() => window.open(`http://localhost:2000/${rowData.file?.filePath}`, '_blank')}
-
+                                                text
+                                                onClick={() => window.open(`http://localhost:2000/api/files/files/${rowData.file?.fileName}`, '_blank')}
                                             />
-                                            <Button
-                                                icon="pi pi-print"
-                                                className="p-button-sm p-button-text"
-                                                onClick={() => {
-                                                    // const printWindow = window.open(rowData.file?.filePath, '_blank');
-                                                    const printWindow = window.open(`http://localhost:2000/${rowData.file?.filePath}`, '_blank')
-
-                                                    if (printWindow) {
-                                                        printWindow.focus();
-                                                        printWindow.onload = () => {
-                                                            printWindow.print();
-                                                        };
-                                                    }
-                                                }}
-                                            />
+                                           
                                         </div>
                                     </div>
                                 ) : (<>No File</>)}
@@ -233,6 +212,19 @@ const TaskPage = (props) => {
                     {messages.map((msg, index) => (
                         <div key={index} style={{ marginBottom: '10px' }}>
                             {msg.timestamp}
+                            <div style={{display:'flex'}}>
+                            <Avatar
+                        label={msg.senderURL?"":msg.sender ? msg.sender[0] : ""} 
+                        size="large"
+                        shape="circle"
+                        style={{
+                            backgroundImage: `url(${msg.senderURL})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            marginRight: "10px",
+                        }}
+                        src={msg.senderURL}
+                    />
                             <div style={{
                                 padding: "5%",
                                 backgroundColor: msg.sender === client.name ? '#dcdcdc' : '#f5f5f5',
@@ -240,6 +232,7 @@ const TaskPage = (props) => {
                             }}>
                                 {`${msg.sender}: ${msg.content}`}
                             </div>
+                        </div>
                         </div>
                     ))}
                     <div ref={messagesEndRef} />
@@ -253,7 +246,6 @@ const TaskPage = (props) => {
                     />
                     <Button label="Send" onClick={sendMessage} />
                 </div>
-                {/* </Card> */}
             </Dialog>
 
             <Dialog
@@ -274,7 +266,7 @@ const TaskPage = (props) => {
                                 borderRadius: "5px",
                                 cursor: "pointer"
                             }}>
-                                 {`${manager.managerid.name}-${manager.projectid.name}`}
+                                {`${manager.managerid.name}-${manager.projectid.name}`}
 
                             </div>
                         </div>
@@ -283,17 +275,13 @@ const TaskPage = (props) => {
 
             </Dialog>
 
-
-
-
-
             <Dialog
                 visible={showCompleted}
                 modal
                 onHide={() => { if (!showCompleted) return; setShowCompleted(false); }}
                 content={({ hide }) => (
                     <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
-                     <h2 style={{textAlign:'center'}}>Do you want to respond?</h2>
+                        <h2 style={{ textAlign: 'center' }}>Do you want to respond?</h2>
 
                         <div className="inline-flex flex-column gap-2">
                             <Dropdown
@@ -308,10 +296,10 @@ const TaskPage = (props) => {
                             <InputTextarea placeholder="write your comment hear...." value={taskCompleted.comment} disabled={!isToday} onChange={(e) => setTaskCompleted({ ...taskCompleted, comment: e.target.value })} />
                         </div>
                         <div className="flex align-items-center gap-2">
-{  taskCompleted.comment||taskCompleted.dictionary?
-<Button label="Send" onClick={(e) => { hide(e); updateTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
-:<Button disabled label="Send" onClick={(e) => { hide(e); updateTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
-}                        
+                            {taskCompleted.comment || taskCompleted.difficulty ?
+                                <Button label="Send" onClick={(e) => { hide(e); updateTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+                                : <Button disabled label="Send" onClick={(e) => { hide(e); updateTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+                            }
                             <Button label="No" onClick={(e) => { hide(e); setTaskCompleted({}); updateTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
                         </div>
                     </div>

@@ -5,10 +5,8 @@ const cors = require("cors");
 const corsOptions = require("./config/corsOptions");
 const mongoose = require("mongoose");
 const connectDB = require("./config/dbConn");
-
 const http = require('http');
 const socketIo = require('socket.io');
-
 const PORT = process.env.PORT || 2004;
 const app = express();
 connectDB();
@@ -25,7 +23,7 @@ const bodyParser = require("body-parser");
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -34,9 +32,8 @@ app.use("/api/users", require("./routes/user"));
 app.use("/api/tasks", require("./routes/task"));
 app.use("/api/login", require("./routes/login"));
 app.use("/api/projects", require("./routes/project"));
-//email
 app.use('/api/email', require("./routes/emailRoutes"));
-
+app.use('/api/files', require("./routes/file"))
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB");
   

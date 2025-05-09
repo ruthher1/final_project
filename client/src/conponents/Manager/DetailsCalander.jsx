@@ -16,11 +16,13 @@ import { ScrollPanel } from 'primereact/scrollpanel';
 import { Message } from 'primereact/message';
 import DetailsTask from './DetailsTask';
 import { useSelector } from 'react-redux';
+import { Avatar } from 'primereact/avatar';
 
 
 const DetailsCalander = (props) => {
     const id = useSelector(x => x.Id.id)
     const rowData = props.rowData || {}
+    const manager = props.manager || {}
     const [date, setDate] = useState(new Date());
     const [showAdd, setShowAdd] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
@@ -30,8 +32,6 @@ const DetailsCalander = (props) => {
     const menuLeft = useRef(null);
     const [visible, setVisible] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
-    const manager = props.manager || {}
-    const setManager = props.setManager || {}
     const [showDetails, setShowDetails] = useState(false)
     const items = [
         {
@@ -96,7 +96,6 @@ const DetailsCalander = (props) => {
             socket.disconnect();
         };
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-
     }, [visible]);
 
     useEffect(() => {
@@ -107,6 +106,7 @@ const DetailsCalander = (props) => {
         if (newMessage.trim() !== '') {
             const message = {
                 sender: manager.name,
+                senderURL: manager.imageURL,
                 senderId: id,
                 receiverId: rowData._id,
                 content: newMessage,
@@ -118,7 +118,6 @@ const DetailsCalander = (props) => {
     };
 
     const getTasks = async () => {
-
         try {
             const res = await axios.get(`http://localhost:2000/api/tasks/getTasksClient/${id}/${rowData.projectid}/${rowData._id}`,
                 { headers: { Authorization: `Bearer ${token}` } })
@@ -186,13 +185,13 @@ const DetailsCalander = (props) => {
         formData.append("managerid", task.managerid);
         formData.append("clientid", task.clientid);
         formData.append("projectid", task.projectid);
-        if (task.description) {
-            formData.append("description", task.description);
-        }
+        if (task.description) { formData.append("description", task.description); }
         formData.append("file", task.file);
         try {
-            const res = await axios.post(`http://localhost:2000/api/tasks/addTask`, formData,
-                { headers: { Authorization: `Bearer ${token}` } })
+            const res = await axios.post(`http://localhost:2000/api/files/addTask`, formData,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                })
             if (res.status === 200) {
                 setTasks(res.data)
                 setTask({
@@ -218,7 +217,6 @@ const DetailsCalander = (props) => {
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
                 setTasks(res.data)
-
             }
         }
         catch (error) {
@@ -235,7 +233,7 @@ const DetailsCalander = (props) => {
             formData.append("description", selectedTask.description);
         }
         try {
-            const res = await axios.put(`http://localhost:2000/api/tasks/updateTask`, formData,
+            const res = await axios.put(`http://localhost:2000/api/files/updateTask`, formData,
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
                 // const dataTasks = res.data.map((task) => { return task })
@@ -248,7 +246,6 @@ const DetailsCalander = (props) => {
     }
 
     return (
-
         <>
             <Toast ref={toast}></Toast>
             <Menu model={items} popup ref={menuLeft} id="popup_menu_left" />
@@ -349,6 +346,7 @@ const DetailsCalander = (props) => {
                     </table>
                 </Card>
             </div>
+
             <Dialog
                 visible={showAdd}
                 modal
@@ -374,11 +372,11 @@ const DetailsCalander = (props) => {
                             />
                         </div>
                         <div className="flex align-items-center gap-2">
-{ task.title? 
-<Button label="Add" onClick={(e) => { hide(e); addTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
-:<Button disabled label="Add" onClick={(e) => { hide(e); addTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+                            {task.title ?
+                                <Button label="Add" onClick={(e) => { hide(e); addTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+                                : <Button disabled label="Add" onClick={(e) => { hide(e); addTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
 
-}                            <Button label="Cancel" onClick={(e) => {
+                            }                            <Button label="Cancel" onClick={(e) => {
                                 hide(e); setTask({
                                     title: "",
                                     description: "",
@@ -401,7 +399,7 @@ const DetailsCalander = (props) => {
                 onHide={() => { if (!showEdit) return; setShowEdit(false); }}
                 content={({ hide }) => (
                     <div className="flex flex-column px-8 py-5 gap-4" style={{ borderRadius: '12px', backgroundColor: 'white' }}>
-                        <h2 style={{ textAlign: 'center' }}>Add the task</h2>
+                        <h2 style={{ textAlign: 'center' }}>Edit the task</h2>
 
                         <div className="inline-flex flex-column gap-2">
                             <InputText value={selectedTask.title} onChange={(e) => setSelectedTask({ ...selectedTask, title: e.target.value })} className="input-focus" placeholder="Task Name" label="TaskName" type="text" required></InputText>
@@ -419,7 +417,7 @@ const DetailsCalander = (props) => {
                                     <Button
                                         icon="pi pi-external-link"
                                         text
-                                        onClick={() => window.open(`http://localhost:2000/${selectedTask.file.filePath}`, '_blank')}
+                                        onClick={() => window.open(`http://localhost:2000/api/files/files/${selectedTask.file.fileName}`, '_blank')}
 
                                     />
                                     <Button
@@ -456,16 +454,15 @@ const DetailsCalander = (props) => {
                             />
                         </div>
                         <div className="flex align-items-center gap-2">
-{ selectedTask.title ?                        
-   <Button label="Update" onClick={(e) => { hide(e); editTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
-:   <Button disabled label="Update" onClick={(e) => { hide(e); editTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+                            {selectedTask.title ?
+                                <Button label="Update" onClick={(e) => { hide(e); editTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
+                                : <Button disabled label="Update" onClick={(e) => { hide(e); editTask() }} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green' }}></Button>
 
-}                            <Button label="Cancel" onClick={(e) => hide(e)} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
+                            }                            <Button label="Cancel" onClick={(e) => hide(e)} className="w-full input-focus" style={{ color: "green", background: "white", border: '1px solid green', }}></Button>
                         </div>
                     </div>
                 )}
             ></Dialog>
-
 
             <Button
                 icon="pi pi-comment"
@@ -487,6 +484,7 @@ const DetailsCalander = (props) => {
                     justifyContent: 'center',
                 }}
             />
+
             <Dialog
                 header={`Chat With ${rowData.name}`}
                 visible={visible}
@@ -501,12 +499,27 @@ const DetailsCalander = (props) => {
 
                         <div key={index} style={{ marginBottom: '10px' }}>
                             {msg.timestamp}
-                            <div style={{
-                                padding: "5%",
-                                backgroundColor: msg.sender === manager.name ? '#dcdcdc' : '#f5f5f5',
-                                borderRadius: "5px"
-                            }}>
-                                {`${msg.sender}: ${msg.content}`}
+                            <div style={{ display: 'flex' }}>
+                                <Avatar
+                                    label={msg.senderURL ? "" : msg.sender ? msg.sender[0] : ""}
+                                    size="large"
+                                    shape="circle"
+                                    style={{
+                                        backgroundImage: `url(${msg.senderURL})`,
+                                        backgroundSize: "cover",
+                                        backgroundPosition: "center",
+                                        marginRight: "10px",
+                                    }}
+                                    src={msg.senderURL}
+                                />
+                                <div style={{
+                                    padding: "5%",
+                                    backgroundColor: msg.sender === manager.name ? '#dcdcdc' : '#f5f5f5',
+                                    borderRadius: "5px"
+                                }}>
+
+                                    {`${msg.sender}: ${msg.content}`}
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -523,12 +536,10 @@ const DetailsCalander = (props) => {
                 </div>
                 {/* </Card> */}
             </Dialog>
+
             <div className="card">
                 {showDetails && <DetailsTask selectedTask={selectedTask} setShowDetails={setShowDetails} />}
-
             </div>
-
-
         </>
     );
 };

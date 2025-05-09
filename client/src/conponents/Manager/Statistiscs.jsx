@@ -25,7 +25,6 @@ const TaskStatisticsDashboard = () => {
             const res = await axios.get(`http://localhost:2000/api/tasks/getAllManagerTasks/${id}`,
                 { headers: { Authorization: `Bearer ${token}` } })
             if (res.status === 200) {
-                // const tasksData = res.data.map((task) => { return task })
                 makeAnalitics(res.data);
             }
         }
@@ -35,8 +34,6 @@ const TaskStatisticsDashboard = () => {
     }
 
     const makeAnalitics = (Mytasks) => {
-        // const today = new Date();
-        // const { startDate, endDate } = getWeekRange(today);
          setCompletedTasks ( Mytasks.filter(task => task.completed === true && new Date(task.date) > startDate && new Date(task.date) < endDate));
          setMissedTasks (Mytasks.filter(task => task.completed === false && new Date(task.date) > startDate && new Date(task.date) < endDate));
          setTasks (Mytasks.filter(task => new Date(task.date) > startDate && new Date(task.date) < endDate));
@@ -65,14 +62,14 @@ const barData = days.map((day, index) => ({
   ];
 
 
-  const lineData = [
-    { day: "Sun", percent: 70 },
-    { day: "Mon", percent: 90 },
-    { day: "Tue", percent: 66 },
-    { day: "Wed", percent: 44 },
-    { day: "Thu", percent: 100 },
-    { day: "Fri", percent: 43 }
-  ];
+  // const lineData = [
+  //   { day: "Sun", percent: 70 },
+  //   { day: "Mon", percent: 90 },
+  //   { day: "Tue", percent: 66 },
+  //   { day: "Wed", percent: 44 },
+  //   { day: "Thu", percent: 100 },
+  //   { day: "Fri", percent: 43 }
+  // ];
 
   const COLORS = ["#4ade80", "#f87171", "#60a5fa", "#facc15"];
 
@@ -119,7 +116,7 @@ const barData = days.map((day, index) => ({
         </ResponsiveContainer>
       </section>
 
-      <section className="mb-12">
+      {/* <section className="mb-12">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Daily Completion Trend</h2>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={lineData}>
@@ -131,7 +128,7 @@ const barData = days.map((day, index) => ({
             <Line type="monotone" dataKey="percent" stroke="#60a5fa" name="% Completed" />
           </LineChart>
         </ResponsiveContainer>
-      </section>
+      </section> */}
     </div>
   );
 };

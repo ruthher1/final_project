@@ -15,11 +15,7 @@ export default function HeaderClient(props) {
   const id=useSelector(x=>x.Id.id)
   const client=props.client||{}
   const setClient=props.setClient||{}
-  const managers = props.managers || {}
-  const[selectedManager,srtSelectedManager]=useState({})
-    const tasks = props.tasks || {}
-    const setTasks = props.setTasks || {} 
-     const token = JSON.parse(localStorage.getItem('token')) || ""
+  const token = JSON.parse(localStorage.getItem('token')) || ""
   const navigate = useNavigate()
   const [showSettings, setShowSettings] = useState(false);
 
@@ -102,7 +98,6 @@ export default function HeaderClient(props) {
     </div> 
     <div className="card">
                 {showSettings && <Settings client={client} setClient={setClient} setShowSettings={setShowSettings}/>}
-
           </div>
 
     </>

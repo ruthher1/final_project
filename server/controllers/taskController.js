@@ -3,54 +3,52 @@ const User = require("../models/User")
 const File = require("../models/File")
 const Connection = require("../models/Connection")
 
-const addTask = async (req, res) => {
-    console.log("addTask");
+// const addTask = async (req, res) => {
+//     console.log("addTask");
     
-    const { title, description, managerid, clientid, projectid, date } = req.body
-    const file=req.file
-    if (!title || !managerid || !clientid || !projectid || !date) {
-        return res.status(400).send("title clientid managerid projectid date are required")
-    }
-    // console.log(req.file)
-    let fileExists=null
-    let fileData=null
-    // console.log(file);
-    if (file) {
-        fileData = {
-            fileName: file.originalname,
-            filePath: file.path,
-            fileSize: file.size,
-            fileType: file.mimetype
-        };
-        if (!file.originalname || !file.path || !file.size || !file.mimetype) {
-            return res.status(400).send("name type size path are required")
-        }
+//     const { title, description, managerid, clientid, projectid, date } = req.body
+//     const file=req.file
+//     if (!title || !managerid || !clientid || !projectid || !date) {
+//         return res.status(400).send("title clientid managerid projectid date are required")
+//     }
+//     let fileExists=null
+//     let fileData=null
+//     if (file) {
+//         fileData = {
+//             fileName: file.originalname,
+//             filePath: file.path,
+//             fileSize: file.size,
+//             fileType: file.mimetype
+//         };
+//         if (!file.originalname || !file.path || !file.size || !file.mimetype) {
+//             return res.status(400).send("name type size path are required")
+//         }
         
-        fileExists = await File.findOne(fileData).lean()
-        if (!fileExists) {
-            console.log("הקובץ לא קים ומוסיף אותו");
-            fileExists = await File.create(fileData)
-            if (!fileExists) {
-                return res.status(400).send("fileExists not created")
-            }
-        }
-    }
-    const connection = await Connection.findOne({ clientid, projectid, managerid }).lean()
-    if (!connection) {
-        return res.status(400).send("connection ient not found")
-    }
-    const task = await Task.create({ title, connectionid: connection._id.toString(), description, date, file: fileExists?._id })
-    if (!task) {
-        return res.status(400).send("task not created")
-    }
+//         fileExists = await File.findOne(fileData).lean()
+//         if (!fileExists) {
+//             console.log("הקובץ לא קים ומוסיף אותו");
+//             fileExists = await File.create(fileData)
+//             if (!fileExists) {
+//                 return res.status(400).send("fileExists not created")
+//             }
+//         }
+//     }
+//     const connection = await Connection.findOne({ clientid, projectid, managerid }).lean()
+//     if (!connection) {
+//         return res.status(400).send("connection ient not found")
+//     }
+//     const task = await Task.create({ title, connectionid: connection._id.toString(), description, date, file: fileExists?._id })
+//     if (!task) {
+//         return res.status(400).send("task not created")
+//     }
 
-    const tasks = await Task.find({ connectionid: connection._id }).populate("file").lean()
-    if (!tasks) {
-        return res.status(400).send("tasks not found")
-    }
+//     const tasks = await Task.find({ connectionid: connection._id }).populate("file").lean()
+//     if (!tasks) {
+//         return res.status(400).send("tasks not found")
+//     }
 
-    res.json(tasks)
-}
+//     res.json(tasks)
+// }
 
 
 
@@ -115,67 +113,67 @@ const getAllManagerTasks = async (req, res) => {
 
 
 
-const updateTask = async (req, res) => {
-    const { id, title, description } = req.body
-    const file=req.file
+// const updateTask = async (req, res) => {
+//     const { id, title, description } = req.body
+//     const file=req.file
     
-    if (!title || !id) {
-        return res.status(400).send("title id are required")
-    }
-    const task = await Task.findById(id).exec()
-    if (!task) {
-        return res.status(400).send("task not found")
-    }
-    let fileExists = null
-    let fileData = null
-    if (file) {
-        fileData = {
-            fileName: file.originalname,
-            filePath: file.path,
-            fileSize: file.size,
-            fileType: file.mimetype
-        };
-        const tasks = await Task.find({ file: task.file}).lean()
-        if (!tasks) {
-            return res.status(400).send("tasks not found")
-        }
-        if (tasks.length === 1) {
-            const deletefile = await File.findById(task.file).exec()
-            if (!deletefile) {
-                return res.status(400).send("deletefile not found")
-            }
+//     if (!title || !id) {
+//         return res.status(400).send("title id are required")
+//     }
+//     const task = await Task.findById(id).exec()
+//     if (!task) {
+//         return res.status(400).send("task not found")
+//     }
+//     let fileExists = null
+//     let fileData = null
+//     if (file) {
+//         fileData = {
+//             fileName: file.originalname,
+//             filePath: file.path,
+//             fileSize: file.size,
+//             fileType: file.mimetype
+//         };
+//         const tasks = await Task.find({ file: task.file}).lean()
+//         if (!tasks) {
+//             return res.status(400).send("tasks not found")
+//         }
+//         if (tasks.length === 1) {
+//             const deletefile = await File.findById(task.file).exec()
+//             if (!deletefile) {
+//                 return res.status(400).send("deletefile not found")
+//             }
 
-            const result = await deletefile.deleteOne()
-            if (!result) {
-                return res.status(400).send("project not deleted")
-            }
-        }
+//             const result = await deletefile.deleteOne()
+//             if (!result) {
+//                 return res.status(400).send("project not deleted")
+//             }
+//         }
 
       
-        if (!file.originalname || !file.path || !file.size || !file.mimetype) {
-            return res.status(400).send("name type size path are required")
-        }
-        fileExists = await File.findOne(fileData).lean()
-        if (!fileExists) {
-            fileExists = await File.create(fileData)
-            if (!fileExists) {
-                return res.status(400).send("fileExists not created")
-            }
-        }
-    }
-    task.title = title
-    task.description = description
-    task.file = fileExists?fileExists._id:null
-    const newTask = await task.save()
-    if (!newTask) {
-        return res.status(400).send("task not updated")
-    }
-    const tasks = await Task.find({ connectionid: task.connectionid }).populate("file").lean()
-    if (!tasks) {
-        return res.status(400).send("tasks not found")
-    }
-    res.json(tasks)
-}
+//         if (!file.originalname || !file.path || !file.size || !file.mimetype) {
+//             return res.status(400).send("name type size path are required")
+//         }
+//         fileExists = await File.findOne(fileData).lean()
+//         if (!fileExists) {
+//             fileExists = await File.create(fileData)
+//             if (!fileExists) {
+//                 return res.status(400).send("fileExists not created")
+//             }
+//         }
+//     }
+//     task.title = title
+//     task.description = description
+//     task.file = fileExists?fileExists._id:null
+//     const newTask = await task.save()
+//     if (!newTask) {
+//         return res.status(400).send("task not updated")
+//     }
+//     const tasks = await Task.find({ connectionid: task.connectionid }).populate("file").lean()
+//     if (!tasks) {
+//         return res.status(400).send("tasks not found")
+//     }
+//     res.json(tasks)
+// }
 
 const completeTask = async (req, res) => {
     const { id, completed, difficulty, comment ,clientid} = req.body
@@ -241,4 +239,4 @@ const deleteTask = async (req, res) => {
     res.json(tasks)
 }
 
-module.exports = { getTasks, addTask, getTask, updateTask, deleteTask, completeTask, getTasksClient ,getAllManagerTasks}
+module.exports = { getTasks, getTask, deleteTask, completeTask, getTasksClient ,getAllManagerTasks}
