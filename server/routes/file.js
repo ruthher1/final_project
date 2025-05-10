@@ -14,8 +14,8 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-router.post('/addTask',userJWT,managerMiddleware,upload.single('file'), fileController.addTask);
-router.put('/updateTask',userJWT,managerMiddleware,upload.single('file'), fileController.updateTask);
+router.post('/addTask',upload.single('file'), fileController.addTask);
+router.put('/updateTask',upload.single('file'), fileController.updateTask);
 router.get('/files/:fileName',fileController.viewFile);
 router.get('/download/:fileName',fileController.downloadFile);
 module.exports = router;

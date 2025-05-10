@@ -42,6 +42,7 @@ export default function Header(props) {
           }
         }
         catch (err) {
+    
           console.error(err)
         }
       };

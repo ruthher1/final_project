@@ -188,7 +188,7 @@ const DetailsCalander = (props) => {
         if (task.description) { formData.append("description", task.description);}
         formData.append("file", task.file);
         try {
-            const res = await axios.post(`http://localhost:2000/api/tasks/addTask`, formData,
+            const res = await axios.post(`http://localhost:2000/api/files/addTask`, formData,
                 { headers: { Authorization: `Bearer ${token}` },
              })
             if (res.status === 200) {
